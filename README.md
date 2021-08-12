@@ -1,2 +1,2 @@
 # ReliabiliPy
-System level structural reliability.
+System level structural reliability in Python.
