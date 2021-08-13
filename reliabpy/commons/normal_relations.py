@@ -63,6 +63,7 @@ def logN2N(l_mean, l_std):
     return mean, np.sqrt(std2)
 
 if __name__ == '__main__':
+    # TODO: transform it in tests
     ####################
     # JUST FOR TESTING #
     ####################
