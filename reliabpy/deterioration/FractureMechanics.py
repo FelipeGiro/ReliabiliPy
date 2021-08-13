@@ -77,7 +77,7 @@ class Paris_Erdogan:
     def _filter_values(self, a):
         bad_values = np.full_like(a, False, dtype=bool)
         isnan = np.isnan(a)
-        decrasing = (a - self.a) < 0 
+        decrasing = (a - self.a) <= 0 
         bad_values[isnan | decrasing] = True
 
         # TODO: count and register bad values count. Must deal with arrays and floats
