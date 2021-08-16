@@ -8,9 +8,11 @@ def discretize(discretization, dist_params, scipy_stats_dist=norm):
     dist_params['x'] = discretization
     return np.diff(scipy_stats_dist.cdf(**dist_params))/np.diff(discretization)
 
+# TODO: Transition matrix class
+# write a class to built the transiton matrix for DBN from a given function. 
+
 class TransitionMatrix:
     def __init__(self):
-        # TODO: function to build transition matrix
         pass
 
     def initialize(self, discretization, function):

@@ -1,9 +1,3 @@
- # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 17 18:21:09 2021
-
-@author: User
-"""
 import numpy as np
 import pandas as pd
 from SystemReliability import SysReliab
