@@ -1,6 +1,6 @@
-from reliabpy.method import MonteCarlo, DynamicBayesianNetwork
+from reliabpy.models.inference import MonteCarlo, DynamicBayesianNetwork
 from reliabpy.readwrite.ANAST import *
-from reliabpy.deterioration import FractureMechanics as fm
+from reliabpy.models.deterioration import *
 from scipy.special import gamma
 
 import matplotlib.pyplot as plt
@@ -14,30 +14,36 @@ C = np.random.lognormal(lnC_mean, lnC_std, n_samples)
 a_0 = np.random.exponential(a0_mean, n_samples)
 S = q*gamma(1.0+1.0/h)
 
-Y_g = fm.GeometricFactor.lognormal(n_samples=n_samples)
-det_model = fm.Paris_Erdogan()
+Y_g = GeometricFactor.lognormal(n_samples=n_samples)
+det_model = Paris_Erdogan()
 det_model.initialize(a_0, m, n, C, S, Y_g)
 function = det_model.propagate
 
-# MCS
-mcs = MonteCarlo.foward_propagation()
-mcs.initialize(a_0, function, a_crit)
-
-for t in range(lifetime):
-    mcs.predict()
-    # TODO: update for MCS
-    # after and from MonteCarlo class
+inspection_years = [9, 17]
 
 # DBN
 T_path = "PhD\\transition_matrices\\dr_out_atm.mat"
 T, b0, discretizations = import_DBN_input_data(T_path)
 
 dbn = DynamicBayesianNetwork.DeteriorationRate()
+dbn.force_detection, dbn.force_notdetection = False, True
 dbn.initialize(T, discretizations, b0)
-for t in range(lifetime):
+while dbn.t <= lifetime:
     dbn.predict()
-    # TODO: update for DBN
-    # after and from DynamicBayesianNetwork class
+
+    if dbn.t in inspection_years:
+        dbn.update(model='PoD', parameters={'quality': 'bad'})
+
+# MCS
+mcs = MonteCarlo.foward_propagation()
+mcs.force_detection, mcs.force_notdetection = False, True
+mcs.initialize(a_0, function, a_crit)
+
+while mcs.t <= lifetime:
+    mcs.predict()
+    
+    if mcs.t in inspection_years:
+        mcs.update(parameters={'quality': 'bad'})
 
 plt.plot(*mcs.get_pfs(), label='MCS', ls='--')
 plt.plot(*dbn.get_pfs(), label='DBN')
