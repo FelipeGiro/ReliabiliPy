@@ -15,7 +15,8 @@ a_0 = np.random.exponential(a0_mean, n_samples)
 S = q*gamma(1.0+1.0/h)
 
 Y_g = fm.GeometricFactor.lognormal(n_samples=n_samples)
-det_model = fm.Paris_Erdogan(a_0, m, n, C, S, Y_g)
+det_model = fm.Paris_Erdogan()
+det_model.initialize(a_0, m, n, C, S, Y_g)
 function = det_model.propagate
 
 # MCS
@@ -24,7 +25,8 @@ mcs.initialize(a_0, function, a_crit)
 
 for t in range(lifetime):
     mcs.predict()
-    # TODO: update
+    # TODO: update for MCS
+    # after and from MonteCarlo class
 
 # DBN
 T_path = "PhD\\transition_matrices\\dr_out_atm.mat"
@@ -34,7 +36,8 @@ dbn = DynamicBayesianNetwork.DeteriorationRate()
 dbn.initialize(T, discretizations, b0)
 for t in range(lifetime):
     dbn.predict()
-    # TODO: update
+    # TODO: update for DBN
+    # after and from DynamicBayesianNetwork class
 
 plt.plot(*mcs.get_pfs(), label='MCS', ls='--')
 plt.plot(*dbn.get_pfs(), label='DBN')
