@@ -151,14 +151,11 @@ class DynamicBayesianNetwork(_Base):
         
         if self.store_results: self._store_results()
     
-    def update(self, model, parameters):
-        self.obs = model
-        if model == 'normal':
-            parameters, function = parameters, norm.cdf
-            obs_pmf = self._discretize(self.discretizations['a'], parameters, function)
-        elif model == 'PoD':
-            parameters, function = PoD.get_settings(parameters['quality'])
-            obs_pmf = function(self.states_values, **parameters)
+    def update(self, parameters):
+        self.model = 'PoD'
+
+        parameters, function = PoD.get_settings(parameters['quality'])
+        obs_pmf = function(self.states_values, **parameters)
 
         obs_state = np.tile(obs_pmf, int(self.total_nstates/len(obs_pmf)))
         detected_pmf = self.s*obs_state
