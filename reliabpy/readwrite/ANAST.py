@@ -1,5 +1,8 @@
 import numpy as np
 from scipy.io import loadmat
+import os
+from scipy.special import gamma
+from reliabpy.models.deterioration import GeometricFactor, Paris_Erdogan
 
 """
 ANAST import functions
@@ -148,4 +151,24 @@ def import_weilbull_mean(path):
     q = M['q_det'][0,0]
 
     return q
+
+def get_deterioration_model(folder_path):
+    lnC_mean, lnC_std = import_calibrated_values(os.path.join(folder_path, "cal_out.mat"))
+    DFF, lifetime, a0_mean, a_crit, description, h, sn_params, m, q_cov, n_samples, n = import_component_inputs(os.path.join(folder_path,"_SNparams.mat"))
+    q_mean = import_weilbull_mean(os.path.join(folder_path,"q_out.mat"))
+    q = np.random.normal(q_mean, q_mean*q_cov, n_samples)
+    C = np.random.lognormal(lnC_mean, lnC_std, n_samples)
+    a_0 = np.random.exponential(a0_mean, n_samples)
+    S = q*gamma(1.0+1.0/h)
+
+    Y_g = GeometricFactor.lognormal(n_samples=n_samples)
+    det_model = Paris_Erdogan()
+    det_model.initialize(a_0, m, n, C, S, Y_g)
+    function = det_model.propagate
+
+    import_DBN_input_data()
+
+    return function
+
+
 
