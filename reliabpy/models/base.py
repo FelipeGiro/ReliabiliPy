@@ -34,7 +34,7 @@ class Component:
         return results
 
 class SystemModel:
-    def __init__(self, components_reliability_models_list):
+    def __init__(self, components_reliability_models_list, policy=None):
         
         # transforming to dataclass Component
         self.components_list = []
@@ -47,16 +47,24 @@ class SystemModel:
             _temp_Component.store()
 
             self.components_list.append(_temp_Component)
+        
+        self.policy = policy
     
     def foward_one_timestep(self):
         for component in self.components_list:
             
             component.inference_model.predict()
             component.store()
-            
-            # TODO: update 
+            if self.policy is not None:
+                print("Select the components with highest VoI")
+                # TODO: update
+  
+            if self.policy is not None:
+                print("Select components with detected crack to repair")
+                # TODO: action
 
-            # TODO: action
+            if self.policy is not None:
+                print("Repair as new")
     
     def get_results(self):
         system = list()
