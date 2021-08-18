@@ -5,12 +5,13 @@ from reliabpy.models.observation import Probability_of_Detection as PoD
 # TODO: documentation
 
 class _Base(object):
-    def __init__(self, store_results=True):
-        self.store_results = store_results
+    def _global_init(self):
+        self.store_results = True
         self.t, self.obs, self.action = 0, None, None
 
         self.force_detection =  False
         self.force_notdetection = False
+
 
     def _store_results(self):
         if self.store_results:
@@ -46,6 +47,8 @@ class _Base(object):
 
 class MonteCarloSimulation(_Base):
     def __init__(self, a_0, function, a_crit):
+        self._global_init()
+
         self.a_0 = a_0 
         self.a = a_0.copy()
         self.f = function
@@ -118,6 +121,8 @@ class DynamicBayesianNetwork(_Base):
     '''
     
     def __init__(self, T, discretizations, s0):
+        self._global_init()
+        
         self.T = T
         self.s = s0
         self.discretizations = discretizations
