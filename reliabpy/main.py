@@ -11,30 +11,30 @@ submerged_zone_model = DynamicBayesianNetwork(*submerged_zone__inputs)
 buried_zone_model = DynamicBayesianNetwork(*buried_zone_inputs)
 
 components_reliability_models_list = {
-'atm1' : {
-    'inference' : atmosphetic_zone_model},
-'atm2' : {
-    'inference' : atmosphetic_zone_model},
-'atm3' : {
-    'inference' : atmosphetic_zone_model},
-'atm4' : {
-    'inference' : atmosphetic_zone_model},
-'sub1' : {
-    'inference' : submerged_zone_model},
-'sub2' : {
-    'inference' : submerged_zone_model},
-'sub3' : {
-    'inference' : submerged_zone_model},
-'sub4' : {
-    'inference' : submerged_zone_model},
-'bur1' : {
-    'inference' : buried_zone_model},
-'bur2' : {
-    'inference' : buried_zone_model},
-'bur3' : {
-    'inference' : buried_zone_model},
-'bur4' : {
-    'inference' : buried_zone_model}
+    'atm1' : {
+        'inference' : atmosphetic_zone_model},
+    'atm2' : {
+        'inference' : atmosphetic_zone_model},
+    'atm3' : {
+        'inference' : atmosphetic_zone_model},
+    'atm4' : {
+        'inference' : atmosphetic_zone_model},
+    'sub1' : {
+        'inference' : submerged_zone_model},
+    'sub2' : {
+        'inference' : submerged_zone_model},
+    'sub3' : {
+        'inference' : submerged_zone_model},
+    'sub4' : {
+        'inference' : submerged_zone_model},
+    'bur1' : {
+        'inference' : buried_zone_model},
+    'bur2' : {
+        'inference' : buried_zone_model},
+    'bur3' : {
+        'inference' : buried_zone_model},
+    'bur4' : {
+        'inference' : buried_zone_model}
 }
 
 
