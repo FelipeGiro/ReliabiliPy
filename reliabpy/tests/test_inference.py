@@ -29,7 +29,7 @@ class TestALL(unittest.TestCase):
         T_path = "PhD\\transition_matrices\\atm\\dr_out.mat"
         T, b0, discretizations = import_DBN_input_data(T_path)
 
-        self.dbn = DynamicBayesianNetwork(T, discretizations, b0)
+        self.dbn = DynamicBayesianNetwork(T, b0, discretizations)
         self.dbn.force_detection, self.dbn.force_notdetection = False, True
         while self.dbn.t <= lifetime:
             self.dbn.predict()

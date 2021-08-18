@@ -120,9 +120,9 @@ class DynamicBayesianNetwork(_Base):
     ========================================
     '''
     
-    def __init__(self, T, discretizations, s0):
+    def __init__(self, T, s0, discretizations):
         self._global_init()
-        
+
         self.T = T
         self.s = s0
         self.discretizations = discretizations
