@@ -45,7 +45,7 @@ class _Base(object):
         
 
 class MonteCarloSimulation(_Base):
-    def initialize(self, a_0, function, a_crit):
+    def __init__(self, a_0, function, a_crit):
         self.a_0 = a_0 
         self.a = a_0.copy()
         self.f = function
@@ -116,15 +116,8 @@ class DynamicBayesianNetwork(_Base):
     Component level dynamic Bayesian network
     ========================================
     '''
-
-    def _reorder(self):
-        return self.s.reshape(list(self.n_states.values()))
     
-    def _discretize(discretization, dist_params, function):
-        dist_params['a'] = discretization
-        return np.diff(function(**dist_params))/np.diff(discretization)
-    
-    def initialize(self, T, discretizations, s0):
+    def __init__(self, T, discretizations, s0):
         self.T = T
         self.s = s0
         self.discretizations = discretizations
@@ -180,6 +173,12 @@ class DynamicBayesianNetwork(_Base):
         s = self._reorder()
         return s.sum(axis=0)[-1]
 
+    def _reorder(self):
+        return self.s.reshape(list(self.n_states.values()))
+    
+    def _discretize(discretization, dist_params, function):
+        dist_params['a'] = discretization
+        return np.diff(function(**dist_params))/np.diff(discretization)
 
 class metrics:
     def pf_rmse(model_1, model_2):
