@@ -1,6 +1,7 @@
 from reliabpy.models.inference import DynamicBayesianNetwork 
 from reliabpy.models.base import SystemModel
 from reliabpy.readwrite.ANAST import import_DBN_input_data
+from reliabpy.commons.visualization import plot_system
 
 atmosphetic_zone_inputs = import_DBN_input_data("C:\\Developments\\reliabpy\PhD\\transition_matrices\\atm\\dr_OUT.mat")
 submerged_zone__inputs = import_DBN_input_data("C:\\Developments\\reliabpy\PhD\\transition_matrices\\sub\\dr_OUT.mat")
@@ -40,4 +41,6 @@ components_reliability_models_list = {
 
 monopile = SystemModel(components_reliability_models_list)
 monopile.run(lifetime=20)
-results = monopile.get_results()
+plot_system(monopile.get_results(), savefolder= 'C:\\Developments\\reliabpy\\PhD\examples\\system.png')
+
+print('--- end ---')
