@@ -1,6 +1,7 @@
 from copy import deepcopy as dcopy
 from tabulate import tabulate
 from reliabpy.policy.policy import HeuristicRules
+from reliabpy.models.observation import Probability_of_Detection
 
 import numpy as np
 
@@ -37,7 +38,10 @@ class Component:
         return datatype + comp_name + table
 
 class SystemModel:
-    def __init__(self, components_reliability_models_list, policy_rules=HeuristicRules, policy_parameters={"delta_t":5, "nI":3}):
+    def __init__(self, components_reliability_models_list, 
+                 policy_rules=HeuristicRules, policy_parameters={"delta_t":5, "nI":3}, 
+                 system_model = None,
+                 costs= {'c_c' : 5.0, 'c_i' : 1.0, 'c_r' : 10.0, 'c_f' : 10000, 'r' : 0.02}):
         
         self.components_last_results = []
         self.components_list = []
@@ -68,10 +72,19 @@ class SystemModel:
             if len(to_inspect) is not 0:
                 for i in to_inspect:
                     component = self.components_list[i]
-                    #component.inference_model.update()
+                    # component.inference_model.update() # TODO: update
                     component.store(obs='PoD', action='PoD')
                     self.components_last_results.append(component.store())
+                    # TODO: repair function
     
+    def system_reliability(self):
+        # TODO: system reliability function
+        pass
+
+    def compute_costs(self):
+        # TODO: cost function
+        pass
+
     def get_results(self):
         system = dict()
         for component in self.components_list:
