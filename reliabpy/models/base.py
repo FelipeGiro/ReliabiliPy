@@ -6,9 +6,10 @@ from reliabpy.models.observation import Probability_of_Detection
 import numpy as np
 
 class Component:
-    def __init__(self, id, inference_model):
+    def __init__(self, id, inference_model, inspection):
         self.id = id
         self.inference_model = inference_model
+        self.inspection = inspection
         self.t, self.pf, self.obs, self.action = list(), list(), list(), list()
 
     def store(self, obs = None, action = None):
@@ -46,9 +47,11 @@ class SystemModel:
         self.components_last_results = []
         self.components_list = []
         for component in components_reliability_models_list:
+
             _temp_Component = Component(
                 component, 
-                dcopy(components_reliability_models_list[component]['inference'])
+                dcopy(components_reliability_models_list[component]['inference']),
+                components_reliability_models_list[component]['inspection']
             )
 
             self.components_list.append(_temp_Component)
@@ -72,7 +75,7 @@ class SystemModel:
             if len(to_inspect) is not 0:
                 for i in to_inspect:
                     component = self.components_list[i]
-                    # component.inference_model.update() # TODO: update
+                    component.inference_model.update(component.inspection)
                     component.store(obs='PoD', action='PoD')
                     self.components_last_results.append(component.store())
                     # TODO: repair function

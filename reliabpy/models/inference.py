@@ -149,10 +149,10 @@ class DynamicBayesianNetwork(_Base):
         
         if self.store_results: self._store_results()
     
-    def update(self, parameters):
+    def update(self, insp_quality): # TODO: do it more general
         self.model = 'PoD'
 
-        parameters, function = PoD.get_settings(parameters['quality'])
+        parameters, function = PoD.get_settings(insp_quality)
         obs_pmf = function(self.states_values, **parameters)
 
         obs_state = np.tile(obs_pmf, int(self.total_nstates/len(obs_pmf)))

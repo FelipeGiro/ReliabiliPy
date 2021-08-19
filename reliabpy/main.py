@@ -14,36 +14,40 @@ buried_zone_model = DynamicBayesianNetwork(*buried_zone_inputs)
 components_reliability_models_list = {
     'atm1' : {
         'inference' : atmosphetic_zone_model,
-        'inspection_parameters': 'normal'},
+        'inspection': 'normal'},
     'atm2' : {
         'inference' : atmosphetic_zone_model,
-        'inspection_parameters': 'normal'},
+        'inspection': 'normal'},
     'atm3' : {
-        'inference' : atmosphetic_zone_model},
-        'inspection_parameters': 'normal',
+        'inference' : atmosphetic_zone_model,
+        'inspection': 'normal'},
     'atm4' : {
         'inference' : atmosphetic_zone_model,
-        'inspection_parameters': 'normal'},
+        'inspection': 'normal'},
     'sub1' : {
         'inference' : submerged_zone_model,
-        'inspection_parameters': 'bad'},
+        'inspection': 'bad'},
     'sub2' : {
         'inference' : submerged_zone_model,
-        'inspection_parameters': 'bad'},
+        'inspection': 'bad'},
     'sub3' : {
         'inference' : submerged_zone_model,
-        'inspection_parameters': 'bad'},
+        'inspection': 'bad'},
     'sub4' : {
         'inference' : submerged_zone_model,
-        'inspection_parameters': 'bad'},
+        'inspection': 'bad'},
     'bur1' : {
-        'inference' : buried_zone_model},
+        'inference' : buried_zone_model,
+        'inspection': None},
     'bur2' : {
-        'inference' : buried_zone_model},
+        'inference' : buried_zone_model,
+        'inspection': None},
     'bur3' : {
-        'inference' : buried_zone_model},
+        'inference' : buried_zone_model,
+        'inspection': None},
     'bur4' : {
-        'inference' : buried_zone_model}
+        'inference' : buried_zone_model,
+        'inspection': None}
 }
 
 
