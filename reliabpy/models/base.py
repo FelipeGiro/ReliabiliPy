@@ -47,6 +47,7 @@ class SystemModel:
         self.system_dependancies = system_dependancies
         self.step_results = {}
         self.components_list = []
+        self.system_pf = []
         self.t = 0
         for component in components_reliability_models_list:
 
@@ -70,6 +71,7 @@ class SystemModel:
             component.inference_model.predict()
             component.store()
             self.step_results = self.get_step_results()
+        self.system_pf.append(self.system_reliability())
         
         if self.policy_rules is not None:
             # update
@@ -80,6 +82,7 @@ class SystemModel:
                     component.inference_model.update(component.inspection)
                     component.store()
                     self.step_results = self.get_step_results()
+                self.system_pf.append(self.system_reliability())
 
             # repair
             self.to_repair = self.policy_rules.to_repair()
@@ -89,6 +92,7 @@ class SystemModel:
                     component.inference_model.perform_action()
                     component.store()
                     self.step_results = self.get_step_results()
+                self.system_pf.append(self.system_reliability())
         self.t += 1
 
     def system_reliability(self):
@@ -106,7 +110,6 @@ class SystemModel:
         for component in self.components_list:
             temp = component.last_results
             step_results[component.id] = temp
-        # step_results['system_pf'] = self.system_reliability()
         return step_results
 
     def get_results(self):
