@@ -61,11 +61,12 @@ class System_of_Subsystems:
     def __init__(self, assignments, k_list):
         self.assignments = np.array(assignments)
         self.k_list = np.array(k_list)
+        self.zones = np.unique(self.assignments)
 
     def compute_system_pf(self, pf_list):
-        zones = np.unique(self.assignments)
+        pf_list = np.array(pf_list)
         subsystem_pfs = []
-        for zone, k in zip(zones, self.k_list):
+        for zone, k in zip(self.zones, self.k_list):
             zone_pfs = pf_list[self.assignments == zone]
             subsystem_pfs.append(comp_k_out_of_n(zone_pfs, k))
         return comp_k_out_of_n(subsystem_pfs, len(subsystem_pfs))

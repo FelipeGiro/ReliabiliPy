@@ -152,6 +152,7 @@ class DynamicBayesianNetwork(_Base):
         self.t += 1
         self.s = np.dot(self.s, self.T)
         self.obs, self.action = None, None
+        self.pf = self.get_prob_fail()
         
         if self.store_results: self._store_results()
     
@@ -178,6 +179,7 @@ class DynamicBayesianNetwork(_Base):
 
         self.s /= self.s.sum()
         self.obs, self.action = None, None
+        self.pf = self.get_prob_fail()
         
         if self.store_results: self._store_results()
     
@@ -185,6 +187,7 @@ class DynamicBayesianNetwork(_Base):
         if self.crack_detected:
             self.action = 'perfect_repair'
             self.s = self.s0
+            self.pf = self.get_prob_fail()
         if self.store_results: self._store_results()
         
     def get_prob_fail(self):

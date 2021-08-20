@@ -47,6 +47,7 @@ class SystemModel:
         self.system_dependancies = system_dependancies
         self.step_results = []
         self.components_list = []
+        self.system_pf = []
         for component in components_reliability_models_list:
 
             _temp_Component = Component(
@@ -63,13 +64,12 @@ class SystemModel:
     
     
     def forward_one_timestep(self):
-        self.step_results = []
-
         ### for every component ###
         # prediction
         for component in self.components_list:
             component.inference_model.predict()
-            self.step_results.append(component.store())
+            component.store()
+            self.step_results = self.get_step_results()
         
         if self.policy_rules is not None:
             # update
@@ -78,7 +78,8 @@ class SystemModel:
                 for i in self.to_inspect:
                     component = self.components_list[i]
                     component.inference_model.update(component.inspection)
-                    self.step_results.append(component.store())
+                    component.store()
+                    self.step_results = self.get_step_results()
 
             # repair
             self.to_repair = self.policy_rules.to_repair()
@@ -86,15 +87,26 @@ class SystemModel:
                 for i in self.to_repair:
                     component = self.components_list[i]
                     component.inference_model.perform_action()
-                    self.step_results.append(component.store())
-    
+                    component.store()
+                    self.step_results = self.get_step_results()
+
+        self.system_reliability()
+
     def system_reliability(self):
-        pf_list = np.array(self.step_results)[:, 1]
-        self.system_pf = self.system_dependancies.compute_system_pf(pf_list)
+        pf_list = [x['pf'] for x in self.step_results.values()]
+        t = list(self.step_results.values())[0]['t']
+        self.system_pf.append((t, self.system_dependancies.compute_system_pf(pf_list)))
 
     def compute_costs(self):
         # TODO: cost function
         pass
+    
+    def get_step_results(self):
+        setp_results = dict()
+        for component in self.components_list:
+            temp = component.last_results
+            setp_results[component.id] = temp
+        return setp_results
 
     def get_results(self):
         system = dict()
@@ -107,7 +119,6 @@ class SystemModel:
     def run(self, lifetime):
         for timestep in range(lifetime):
             self.forward_one_timestep()
-            self.system_reliability()
     
     def post_process(self, savefolder):
         plot_system(self.get_results(), savefolder)

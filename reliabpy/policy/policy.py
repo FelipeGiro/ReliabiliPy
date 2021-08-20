@@ -23,7 +23,7 @@ class HeuristicRules:
 
     def to_observe(self):
         to_inspect = []
-        pf_list = np.array(self.system_model.step_results)[:, 1]
+        pf_list = np.array([x['pf'] for x in self.system_model.step_results.values()])
         if self.to_avoid is not None:
             pf_list[self.to_avoid] = -1
         if self.system_model.components_list[0].last_results['t'] % self.delta_t == 0:
