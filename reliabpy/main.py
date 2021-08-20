@@ -1,5 +1,6 @@
 from reliabpy.models.base import SystemModel
 from reliabpy.models.inference import DynamicBayesianNetwork 
+from reliabpy.models.system_effects import System_of_Subsystems
 from reliabpy.readwrite.ANAST import import_DBN_input_data
 
 def run():
@@ -65,8 +66,10 @@ def run():
             'repair'    : None}
     }
 
+    zone_assingment = ['atm', 'atm', 'atm', 'atm', 'sub', 'sub', 'sub', 'sub', 'bur', 'bur', 'bur', 'bur']
+    zone_k = [3,3,3]
 
-    monopile = SystemModel(components_reliability_models_list)
+    monopile = SystemModel(components_reliability_models_list, system_dependancies = System_of_Subsystems(zone_assingment, zone_k))
     monopile.run(lifetime=20)
     monopile.post_process('C:\\Developments\\reliabpy\\PhD\examples\\system.png')
 
@@ -80,6 +83,5 @@ if __name__ == '__main__':
     run()
     profiler.disable()
     stats = pstats.Stats(profiler).sort_stats('tottime')
-    stats.dump_stats('profile.dat')
-    
+    # stats.dump_stats('profile.dat')
     # subprocess.call(r"snakeviz profile.dat")

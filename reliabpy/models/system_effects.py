@@ -56,3 +56,16 @@ def comp_k_out_of_n(pf, k):
             A[i] = A[i] + (A[i-1]-A[i])*Rel
     PF_sys = 1-A[m]
     return PF_sys   
+
+class System_of_Subsystems:
+    def __init__(self, assignments, k_list):
+        self.assignments = np.array(assignments)
+        self.k_list = np.array(k_list)
+
+    def compute_system_pf(self, pf_list):
+        zones = np.unique(self.assignments)
+        subsystem_pfs = []
+        for zone, k in zip(zones, self.k_list):
+            zone_pfs = pf_list[self.assignments == zone]
+            subsystem_pfs.append(comp_k_out_of_n(zone_pfs, k))
+        return comp_k_out_of_n(subsystem_pfs, len(subsystem_pfs))

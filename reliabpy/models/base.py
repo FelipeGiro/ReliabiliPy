@@ -41,9 +41,10 @@ class Component:
 class SystemModel:
     def __init__(self, components_reliability_models_list, 
                  policy_rules=HeuristicRules, policy_parameters={"delta_t":5, "nI":3}, 
-                 system_model = None,
+                 system_dependancies = None,
                  costs= {'c_c' : 5.0, 'c_i' : 1.0, 'c_r' : 10.0, 'c_f' : 10000, 'r' : 0.02}):
         
+        self.system_dependancies = system_dependancies
         self.step_results = []
         self.components_list = []
         for component in components_reliability_models_list:
@@ -88,8 +89,8 @@ class SystemModel:
                     self.step_results.append(component.store())
     
     def system_reliability(self):
-        # TODO: system reliability function
-        pass
+        pf_list = np.array(self.step_results)[:, 1]
+        self.system_pf = self.system_dependancies.compute_system_pf(pf_list)
 
     def compute_costs(self):
         # TODO: cost function
@@ -106,6 +107,7 @@ class SystemModel:
     def run(self, lifetime):
         for timestep in range(lifetime):
             self.forward_one_timestep()
+            self.system_reliability()
     
     def post_process(self, savefolder):
         plot_system(self.get_results(), savefolder)
