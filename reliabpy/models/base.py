@@ -61,20 +61,25 @@ class SystemModel:
         self.policy_rules = policy_rules(self, **policy_parameters)
     
     
-    def foward_one_timestep(self):
+    def forward_one_timestep(self):
         self.step_results = []
-        for component in self.components_list:
 
+        ### for every component ###
+        # prediction
+        for component in self.components_list:
             component.inference_model.predict()
             self.step_results.append(component.store())
         
         if self.policy_rules is not None:
+            # update
             self.to_inspect = self.policy_rules.to_observe()
             if len(self.to_inspect) is not 0:
                 for i in self.to_inspect:
                     component = self.components_list[i]
                     component.inference_model.update(component.inspection)
                     self.step_results.append(component.store())
+
+            # repair
             self.to_repair = self.policy_rules.to_repair()
             if len(self.to_repair) is not 0:
                 for i in self.to_repair:
@@ -100,7 +105,7 @@ class SystemModel:
 
     def run(self, lifetime):
         for timestep in range(lifetime):
-            self.foward_one_timestep()
+            self.forward_one_timestep()
     
     def post_process(self, savefolder):
         plot_system(self.get_results(), savefolder)
