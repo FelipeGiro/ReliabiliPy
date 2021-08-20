@@ -45,9 +45,9 @@ class SystemModel:
                  costs= {'c_c' : 5.0, 'c_i' : 1.0, 'c_r' : 10.0, 'c_f' : 10000, 'r' : 0.02}):
         
         self.system_dependancies = system_dependancies
-        self.step_results = []
+        self.step_results = {}
         self.components_list = []
-        self.system_pf = []
+        self.t = 0
         for component in components_reliability_models_list:
 
             _temp_Component = Component(
@@ -55,10 +55,10 @@ class SystemModel:
                 dcopy(components_reliability_models_list[component]['inference']),
                 components_reliability_models_list[component]['inspection']
             )
+            _temp_Component.store()
 
             self.components_list.append(_temp_Component)
-
-            self.step_results.append(_temp_Component.store())
+            self.step_results[_temp_Component.id] = _temp_Component.last_results
         
         self.policy_rules = policy_rules(self, **policy_parameters)
     
@@ -89,24 +89,25 @@ class SystemModel:
                     component.inference_model.perform_action()
                     component.store()
                     self.step_results = self.get_step_results()
-
-        self.system_reliability()
+        self.t += 1
 
     def system_reliability(self):
-        pf_list = [x['pf'] for x in self.step_results.values()]
-        t = list(self.step_results.values())[0]['t']
-        self.system_pf.append((t, self.system_dependancies.compute_system_pf(pf_list)))
+        step_results = list(self.step_results.values())
+        pf_list = [x['pf'] for x in step_results]
+        return (self.t, self.system_dependancies.compute_system_pf(pf_list))
+         
 
     def compute_costs(self):
         # TODO: cost function
         pass
     
     def get_step_results(self):
-        setp_results = dict()
+        step_results = dict()
         for component in self.components_list:
             temp = component.last_results
-            setp_results[component.id] = temp
-        return setp_results
+            step_results[component.id] = temp
+        # step_results['system_pf'] = self.system_reliability()
+        return step_results
 
     def get_results(self):
         system = dict()
