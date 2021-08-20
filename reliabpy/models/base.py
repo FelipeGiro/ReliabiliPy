@@ -1,7 +1,7 @@
 from copy import deepcopy as dcopy
 from tabulate import tabulate
 from reliabpy.policy.policy import HeuristicRules
-from reliabpy.models.observation import Probability_of_Detection
+from reliabpy.commons.post_processing import plot_system
 
 import numpy as np
 
@@ -101,5 +101,8 @@ class SystemModel:
     def run(self, lifetime):
         for timestep in range(lifetime):
             self.foward_one_timestep()
+    
+    def post_process(self, savefolder):
+        plot_system(self.get_results(), savefolder)
         
 
