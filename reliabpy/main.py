@@ -69,7 +69,6 @@ def run():
 
     zone_assingment = ['atm', 'atm', 'atm', 'atm', 'sub', 'sub', 'sub', 'sub', 'bur', 'bur', 'bur', 'bur']
     zone_k = [3,3,3]
-    {'c_c' : 5.0, 'c_i' : 1.0, 'c_r' : 10.0, 'c_f' : 10000, 'r' : 0.02}
 
     monopile = SystemModel(
         components_reliability_models_list, 
