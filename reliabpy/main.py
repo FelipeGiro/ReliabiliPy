@@ -1,6 +1,7 @@
 from reliabpy.models.base import SystemModel
 from reliabpy.models.inference import DynamicBayesianNetwork 
 from reliabpy.models.system_effects import System_of_Subsystems
+from reliabpy.models.cost import InspectionMaintenance
 from reliabpy.readwrite.ANAST import import_DBN_input_data
 
 def run():
@@ -68,8 +69,13 @@ def run():
 
     zone_assingment = ['atm', 'atm', 'atm', 'atm', 'sub', 'sub', 'sub', 'sub', 'bur', 'bur', 'bur', 'bur']
     zone_k = [3,3,3]
+    {'c_c' : 5.0, 'c_i' : 1.0, 'c_r' : 10.0, 'c_f' : 10000, 'r' : 0.02}
 
-    monopile = SystemModel(components_reliability_models_list, system_dependancies = System_of_Subsystems(zone_assingment, zone_k))
+    monopile = SystemModel(
+        components_reliability_models_list, 
+        system_dependancies = System_of_Subsystems(zone_assingment, zone_k),
+        cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=10000, r=0.02)
+    )
     monopile.run(lifetime=20)
     monopile.post_process('C:\\Developments\\reliabpy\\PhD\examples\\system.png')
 

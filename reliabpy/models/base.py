@@ -102,8 +102,8 @@ class SystemModel:
          
 
     def compute_costs(self):
-        # TODO: cost function
-        pass
+        for component in self.components_list:
+            pass
     
     def get_step_results(self):
         step_results = dict()
@@ -123,6 +123,7 @@ class SystemModel:
     def run(self, lifetime):
         for timestep in range(lifetime):
             self.forward_one_timestep()
+        self.compute_costs()
     
     def post_process(self, savefolder):
         components_dict, system_pf = self.get_results()
