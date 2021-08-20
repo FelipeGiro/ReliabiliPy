@@ -22,6 +22,7 @@ def plot_system(results_dict, system_pf, savefolder=False):
         plt.savefig(savefolder)
     else:
         plt.plot()
-    
+
+# TODO: a function to transform the computed data in DataFrame
     
 

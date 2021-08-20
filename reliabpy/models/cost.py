@@ -11,4 +11,8 @@ class InspectionMaintenance:
         C_C, C_I, C_R, C_C = 0, 0, 0, 0
         for component in system_model.components_list:
             pass
-            # C_C += component
+            # TODO: compute system costs
+            # C_C += 
+            # C_I +=
+            # C_R +=
+            # C_C +=

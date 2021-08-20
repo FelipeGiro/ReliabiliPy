@@ -1,3 +1,5 @@
+# TODO: transform this file
+
 import numpy as np
 import pandas as pd
 from SystemReliability import SysReliab
@@ -252,6 +254,8 @@ if __name__ == '__main__':
             HeristicsEvaluation(run_set[1])
             
     print('\n=== end of all simulations ===')
+
+    
     
 
 
