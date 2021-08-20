@@ -12,7 +12,7 @@ class Component:
         self.inspection = inspection
         self.t, self.pf, self.obs, self.action = list(), list(), list(), list()
 
-    def store(self, obs = None, action = None):
+    def store(self, obs = False, action = False):
         t      = self.inference_model.t
         pf     = self.inference_model.pf
         
@@ -82,7 +82,7 @@ class SystemModel:
                 for i in self.to_inspect:
                     component = self.components_list[i]
                     component.inference_model.update(component.inspection)
-                    component.store()
+                    component.store(obs=True)
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
 
@@ -92,7 +92,7 @@ class SystemModel:
                 for i in self.to_repair:
                     component = self.components_list[i]
                     component.inference_model.perform_action()
-                    component.store()
+                    component.store(action=True)
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
 
