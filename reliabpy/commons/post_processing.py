@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
-def plot_system(results_dict, savefolder=False):
+def plot_system(results_dict, system_pf, savefolder=False):
     fig, axes = plt.subplots(3, figsize=(10,10))
     
     ax = axes[0]
@@ -12,7 +12,7 @@ def plot_system(results_dict, savefolder=False):
     
     ax = axes[1]
     ax.set_title('System probability of failure')
-    # TODO: implement system
+    ax.plot(np.array(system_pf)[:, 0], np.array(system_pf)[:, 1])
 
     ax = axes[2]
     ax.set_title('Cost breakdown')

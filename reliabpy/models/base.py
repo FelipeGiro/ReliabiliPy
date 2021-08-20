@@ -47,7 +47,6 @@ class SystemModel:
         self.system_dependancies = system_dependancies
         self.step_results = {}
         self.components_list = []
-        self.system_pf = []
         self.t = 0
         for component in components_reliability_models_list:
 
@@ -62,9 +61,11 @@ class SystemModel:
             self.step_results[_temp_Component.id] = _temp_Component.last_results
         
         self.policy_rules = policy_rules(self, **policy_parameters)
+        self.system_pf = [self._system_reliability()]
     
     
     def forward_one_timestep(self):
+        self.t += 1
         ### for every component ###
         # prediction
         for component in self.components_list:
@@ -93,7 +94,6 @@ class SystemModel:
                     component.store()
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
-        self.t += 1
 
     def _system_reliability(self):
         step_results = list(self.step_results.values())
@@ -117,7 +117,7 @@ class SystemModel:
         for component in self.components_list:
             temp = component.get_results()
             system[component.id] = temp
-        return system
+        return system, self.system_pf
         
 
     def run(self, lifetime):
@@ -125,6 +125,7 @@ class SystemModel:
             self.forward_one_timestep()
     
     def post_process(self, savefolder):
-        plot_system(self.get_results(), savefolder)
+        components_dict, system_pf = self.get_results()
+        plot_system(components_dict, system_pf, savefolder)
         
 
