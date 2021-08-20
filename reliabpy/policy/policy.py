@@ -19,16 +19,17 @@ class HeuristicRules:
         self.to_avoid = to_avoid
         self.system_model = system_model
         self.delta_t, self.nI = delta_t, nI
-        self.pf_list = np.array(system_model.components_last_results)[:, 1]
-        if to_avoid is not None:
-            self.pf_list[to_avoid] = -1
+        self.to_avoid = to_avoid
 
     def to_observe(self):
         to_inspect = []
+        pf_list = np.array(self.system_model.step_results)[:, 1]
+        if self.to_avoid is not None:
+            pf_list[self.to_avoid] = -1
         if self.system_model.components_list[0].last_results['t'] % self.delta_t == 0:
-            to_inspect = np.argpartition(self.pf_list, -int(self.nI))[-int(self.nI):]
+            to_inspect = np.argpartition(pf_list, -int(self.nI))[-int(self.nI):]
             
         return to_inspect
     
     def to_repair(self):
-        pass
+        return self.system_model.to_inspect

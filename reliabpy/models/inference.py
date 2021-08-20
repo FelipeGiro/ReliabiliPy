@@ -125,6 +125,7 @@ class DynamicBayesianNetwork(_Base):
 
         self.T = T
         self.s = s0
+        self.s0 = s0.copy()
         self.discretizations = discretizations
 
         self.states_values = np.diff(discretizations['a']/2) + discretizations['a'][:-1]
@@ -140,12 +141,13 @@ class DynamicBayesianNetwork(_Base):
             self.results = [[
                 self.t, 
                 self.get_prob_fail(),
-                None,
-                None]]
+                self.obs,
+                self.action]]
 
     def predict(self):
         self.t += 1
         self.s = np.dot(self.s, self.T)
+        self.obs, self.action = None, None
         
         if self.store_results: self._store_results()
     
@@ -171,7 +173,14 @@ class DynamicBayesianNetwork(_Base):
                 self.s = self.s*(1 - obs_state)
 
         self.s /= self.s.sum()
+        self.obs, self.action = None, None
         
+        if self.store_results: self._store_results()
+    
+    def perform_action(self):
+        if self.crack_detected:
+            self.action = 'perfect_repair'
+            self.s = self.s0
         if self.store_results: self._store_results()
         
     def get_prob_fail(self):

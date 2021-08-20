@@ -44,7 +44,7 @@ class SystemModel:
                  system_model = None,
                  costs= {'c_c' : 5.0, 'c_i' : 1.0, 'c_r' : 10.0, 'c_f' : 10000, 'r' : 0.02}):
         
-        self.components_last_results = []
+        self.step_results = []
         self.components_list = []
         for component in components_reliability_models_list:
 
@@ -56,29 +56,31 @@ class SystemModel:
 
             self.components_list.append(_temp_Component)
 
-            self.components_last_results.append(_temp_Component.store())
+            self.step_results.append(_temp_Component.store())
         
         self.policy_rules = policy_rules(self, **policy_parameters)
     
     
     def foward_one_timestep(self):
-        self.current_results = []
+        self.step_results = []
         for component in self.components_list:
 
             component.inference_model.predict()
-            component.store()
-
-            self.current_results.append(component.last_results)
+            self.step_results.append(component.store())
         
         if self.policy_rules is not None:
-            to_inspect = self.policy_rules.to_observe()
-            if len(to_inspect) is not 0:
-                for i in to_inspect:
+            self.to_inspect = self.policy_rules.to_observe()
+            if len(self.to_inspect) is not 0:
+                for i in self.to_inspect:
                     component = self.components_list[i]
                     component.inference_model.update(component.inspection)
-                    component.store(obs='PoD', action='PoD')
-                    self.components_last_results.append(component.store())
-                    # TODO: repair function
+                    self.step_results.append(component.store())
+            self.to_repair = self.policy_rules.to_repair()
+            if len(self.to_repair) is not 0:
+                for i in self.to_repair:
+                    component = self.components_list[i]
+                    component.inference_model.perform_action()
+                    self.step_results.append(component.store())
     
     def system_reliability(self):
         # TODO: system reliability function

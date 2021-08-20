@@ -1,5 +1,5 @@
-from reliabpy.models.inference import DynamicBayesianNetwork 
 from reliabpy.models.base import SystemModel
+from reliabpy.models.inference import DynamicBayesianNetwork 
 from reliabpy.readwrite.ANAST import import_DBN_input_data
 from reliabpy.commons.visualization import plot_system
 
@@ -12,43 +12,58 @@ def run():
     submerged_zone_model = DynamicBayesianNetwork(*submerged_zone__inputs)
     buried_zone_model = DynamicBayesianNetwork(*buried_zone_inputs)
 
+    atmosphetic_repair = DynamicBayesianNetwork(*atmosphetic_zone_inputs)
+    submerged_repair = DynamicBayesianNetwork(*submerged_zone__inputs)
+
     components_reliability_models_list = {
         'atm1' : {
             'inference' : atmosphetic_zone_model,
-            'inspection': 'normal'},
+            'inspection': 'normal', 
+            'repair'    : atmosphetic_repair},
         'atm2' : {
             'inference' : atmosphetic_zone_model,
-            'inspection': 'normal'},
+            'inspection': 'normal', 
+            'repair'    : atmosphetic_repair},
         'atm3' : {
             'inference' : atmosphetic_zone_model,
-            'inspection': 'normal'},
+            'inspection': 'normal', 
+            'repair'    : atmosphetic_repair},
         'atm4' : {
             'inference' : atmosphetic_zone_model,
-            'inspection': 'normal'},
+            'inspection': 'normal', 
+            'repair'    : atmosphetic_repair},
         'sub1' : {
             'inference' : submerged_zone_model,
-            'inspection': 'bad'},
+            'inspection': 'bad', 
+            'repair'    : submerged_repair},
         'sub2' : {
             'inference' : submerged_zone_model,
-            'inspection': 'bad'},
+            'inspection': 'bad', 
+            'repair'    : submerged_repair},
         'sub3' : {
             'inference' : submerged_zone_model,
-            'inspection': 'bad'},
+            'inspection': 'bad', 
+            'repair'    : submerged_repair},
         'sub4' : {
             'inference' : submerged_zone_model,
-            'inspection': 'bad'},
+            'inspection': 'bad', 
+            'repair'    : submerged_repair},
         'bur1' : {
             'inference' : buried_zone_model,
-            'inspection': None},
+            'inspection': None, 
+            'repair'    : None},
         'bur2' : {
             'inference' : buried_zone_model,
-            'inspection': None},
+            'inspection': None, 
+            'repair'    : None},
         'bur3' : {
             'inference' : buried_zone_model,
-            'inspection': None},
+            'inspection': None, 
+            'repair'    : None},
         'bur4' : {
             'inference' : buried_zone_model,
-            'inspection': None}
+            'inspection': None, 
+            'repair'    : None}
     }
 
 
