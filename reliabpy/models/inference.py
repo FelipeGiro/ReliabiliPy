@@ -17,7 +17,7 @@ class _Base(object):
         if self.store_results:
             self.results.append([
                 self.t, 
-                self.get_prob_fail(),
+                self.pf,
                 self.obs,
                 self.action
                 ])
@@ -56,13 +56,15 @@ class MonteCarloSimulation(_Base):
 
         self.num_samples = len(self.a_0)
 
+        self.pf = self.get_prob_fail()
+
         self.t = 0
         self.PoD = np.ones_like(a_0)
 
         if self.store_results:
             self.results = [[
                 self.t, 
-                self.get_prob_fail(),
+                self.pf,
                 None,
                 None]]
 
@@ -137,10 +139,12 @@ class DynamicBayesianNetwork(_Base):
             self.n_states[var_name] = quant
             self.total_nstates *= quant
         
+        self.pf = self.get_prob_fail()
+
         if self.store_results:
             self.results = [[
                 self.t, 
-                self.get_prob_fail(),
+                self.pf,
                 self.obs,
                 self.action]]
 

@@ -14,7 +14,7 @@ class Component:
 
     def store(self, obs = None, action = None):
         t      = self.inference_model.t
-        pf     = self.inference_model.get_prob_fail() # TODO change to pf
+        pf     = self.inference_model.pf
         
         self.last_results =  {"t" : t, "pf" : pf, "obs" : obs, "action" : action}
 
