@@ -1,20 +1,22 @@
 from reliabpy.models.base import SystemModel
 from reliabpy.models.inference import DynamicBayesianNetwork 
+from reliabpy.policy.policy import HeuristicRules
 from reliabpy.models.system_effects import System_of_Subsystems
 from reliabpy.models.cost import InspectionMaintenance
 from reliabpy.readwrite.ANAST import import_DBN_input_data
+# from reliabpy.policy import optimization
 
 import os
 
 class Simple:
-    def __init__(self, input_folder="C:\\Developments\\reliabpy\PhD\\transition_matrices\\atm", output_folder="C:\\Developments\\reliabpy\\PhD\examples"):
+    def __init__(self, input_folder="C:\\Developments\\reliabpy\PhD\\transition_matrices", output_folder="C:\\Developments\\reliabpy\\PhD\examples"):
         self.input_folder = input_folder
         self.output_folder = output_folder
 
     def mount_model(self):
-        atmosphetic_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "dr_OUT.mat"))
-        submerged_zone__inputs = import_DBN_input_data(os.path.join(self.input_folder, "dr_OUT.mat"))
-        buried_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "dr_OUT.mat"))
+        atmosphetic_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "atm\\dr_OUT.mat"))
+        submerged_zone__inputs = import_DBN_input_data(os.path.join(self.input_folder, "sub\\dr_OUT.mat"))
+        buried_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "bur\\dr_OUT.mat"))
 
         atmosphetic_zone_model = DynamicBayesianNetwork(*atmosphetic_zone_inputs)
         submerged_zone_model = DynamicBayesianNetwork(*submerged_zone__inputs)
@@ -79,13 +81,21 @@ class Simple:
 
         self.monopile = SystemModel(
             components_reliability_models_list, 
+            policy_rules = HeuristicRules(delta_t = 5, nI = 3),
             system_dependancies = System_of_Subsystems(zone_assingment, zone_k),
             cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=10000, r=0.02)
         )
 
+        return self.monopile
+
     def run_one_episode(self):
         self.monopile.run(lifetime=20)
         self.monopile.post_process(self.output_folder)
+    
+    @staticmethod
+    def optimize_heuristic_based_policy(self, n_samples= 10000):
+        n_samples
+
     
 if __name__ == '__main__':
     model = Simple()

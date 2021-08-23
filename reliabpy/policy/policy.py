@@ -25,12 +25,13 @@ class DoNothing:
         pass
 
 class HeuristicRules:
-    def __init__(self, system_model, delta_t, nI, to_avoid=[8,9,10,11], last_year_action=False): # TODO: put to_avoid None
-        self.to_avoid = to_avoid
-        self.system_model = system_model
+    def __init__(self, delta_t, nI, to_avoid=[8,9,10,11], last_year_action=False): # TODO: put to_avoid None
         self.delta_t, self.nI = delta_t, nI
         self.to_avoid = to_avoid
         self.last_year_action = last_year_action
+
+    def import_model(self, system_model):
+        self.system_model = system_model
 
     def to_observe(self):
         to_inspect = []

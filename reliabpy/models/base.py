@@ -1,6 +1,5 @@
 from copy import deepcopy as dcopy
 from tabulate import tabulate
-from reliabpy.policy.policy import HeuristicRules
 from reliabpy.commons.post_processing import OneEpisode
 
 import numpy as np
@@ -40,7 +39,7 @@ class Component:
 
 class SystemModel:
     def __init__(self, components_reliability_models_list, 
-                 policy_rules=HeuristicRules, policy_parameters={"delta_t":5, "nI":3}, 
+                 policy_rules, 
                  system_dependancies = None,
                  cost_model = None):
         
@@ -61,7 +60,8 @@ class SystemModel:
             self.components_list.append(_temp_Component)
             self.step_results[_temp_Component.id] = _temp_Component.last_results
         
-        self.policy_rules = policy_rules(self, **policy_parameters)
+        self.policy_rules = policy_rules
+        self.policy_rules.import_model(self)
         self.system_pf = [self._system_reliability()]
     
     
