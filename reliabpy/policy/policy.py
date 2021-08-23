@@ -14,6 +14,16 @@ class UserDefined:
     def to_repair(self):
         pass
 
+class DoNothing:
+    def __init__(self, system_model):
+        pass
+
+    def to_observe(self):
+        pass
+    
+    def to_repair(self):
+        pass
+
 class HeuristicRules:
     def __init__(self, system_model, delta_t, nI, to_avoid=[8,9,10,11], last_year_action=False): # TODO: put to_avoid None
         self.to_avoid = to_avoid
