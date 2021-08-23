@@ -90,7 +90,7 @@ class Simple:
 
     def run_one_episode(self):
         self.monopile.run(lifetime=20)
-        self.monopile.post_process(self.output_folder)
+        return self.monopile.cost_breakdown
     
     @staticmethod
     def optimize_heuristic_based_policy(self, n_samples= 10000):
