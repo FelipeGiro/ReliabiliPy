@@ -1,6 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 import os
+import pandas as pd
 
 class OneEpisode:
     def __init__(self, system_model, savefolder=False):
@@ -38,6 +39,33 @@ class OneEpisode:
             plt.savefig(os.path.join(self.savefolder, 'SystemReliability.png'))
         else:
             plt.plot()
+
+    def to_excel(self):
+        df_costs = pd.DataFrame(self.system_model.yearly_costs_breakdown)
+        df_costs.set_index('t', inplace=True)
+
+        obs_map = self._build_map(self.system_model.system_obs, index=df_costs.index)
+        action_map = self._build_map(self.system_model.system_obs, index=df_costs.index)
+
+        df_obs = pd.DataFrame(obs_map, index=df_costs.index)
+        df_action = pd.DataFrame(action_map, index=df_costs.index)
+
+        writer = pd.ExcelWriter(os.path.join(self.savefolder, 'SystemReliability.xlsx'), engine='xlsxwriter')
+
+        df_costs.to_excel(writer, sheet_name='Cost_Breakdown')
+        df_obs.to_excel(writer, sheet_name='Observation_Map')
+        df_action.to_excel(writer, sheet_name='Action_Map')
+        
+        writer.save()
+
+    def _build_map(self, comp_dict, index):
+
+        for key, value in comp_dict.items():
+            base_array = np.zeros_like(index, dtype=bool)
+            base_array[value] = True
+            comp_dict[key] = base_array
+        
+        return comp_dict
 
 # TODO: a function to transform the computed data in DataFrame
     

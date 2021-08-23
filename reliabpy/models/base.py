@@ -122,8 +122,11 @@ class SystemModel:
             self.forward_one_timestep()
         self.cost_model.compute_cost_breakdown(self)
     
-    def post_process(self, savefolder):
+    def post_process(self, savefolder, plot=True, excel=True):
         post = OneEpisode(self, savefolder)
-        post.plot_overview()
+        if plot:
+            post.plot_overview()
+        if excel:
+            post.to_excel()
         
 
