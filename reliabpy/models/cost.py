@@ -11,8 +11,7 @@ class InspectionMaintenance:
     
     def compute_cost_breakdown(self, system_model):
         
-        system_obs = list()
-        system_action = list()
+        system_obs, system_action = dict(), dict()
         t, pf = np.vstack(system_model.system_pf).T
         unique_mask = np.diff(t) == 1
         delta_pf = np.diff(pf)[unique_mask]
@@ -29,13 +28,15 @@ class InspectionMaintenance:
                 C_I[t_obs] += self.c_i*(1 - self.r)**t_obs
                 C_R[t_action] += self.c_r*(1 - self.r)**t_action
 
-                system_obs.append(np.array(comp_t)[component.obs])
-                system_action.append(np.array(comp_t)[component.action])
+                system_obs[component.id]= np.array(comp_t)[component.obs]
+                system_action[component.id] = np.array(comp_t)[component.action]
         
-        t_temp = np.unique(np.concatenate(system_obs))
+        t_temp = np.unique(np.concatenate(list(system_obs.values())))
         C_C[t_temp] += self.c_c*(1 - self.r)**(t_temp)
         
         R_F[abs_t[1:]] = self.c_f*delta_pf*(1 - self.r)**abs_t[1:]
         
+        system_model.system_obs = system_obs
+        system_model.system_action = system_action
         system_model.yearly_costs_breakdown =  {'t' : abs_t, 'C_C' : C_C, 'C_I' : C_I, 'C_R' : C_R, 'R_F' : R_F}
         system_model.cost_breakdown = {'C_C' : C_C.sum(), 'C_I' : C_I.sum(), 'C_R' : C_R.sum(), 'R_F' : R_F.sum()}
