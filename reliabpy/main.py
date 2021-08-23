@@ -76,7 +76,7 @@ def run():
         cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=10000, r=0.02)
     )
     monopile.run(lifetime=20)
-    monopile.post_process('C:\\Developments\\reliabpy\\PhD\examples\\system.png')
+    monopile.post_process('C:\\Developments\\reliabpy\\PhD\examples')
 
     print('--- end ---')
 
