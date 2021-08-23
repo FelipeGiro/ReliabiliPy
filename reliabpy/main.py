@@ -15,6 +15,6 @@ if __name__ == '__main__':
     stats = pstats.Stats(profiler).sort_stats('tottime')
     stats.sort_stats('tottime')
     stats.reverse_order()
-    stats.print_stats()
+    # stats.print_stats()
     # stats.dump_stats('profile.dat')
     # subprocess.call(r"snakeviz profile.dat")
