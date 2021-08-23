@@ -1,7 +1,7 @@
 from copy import deepcopy as dcopy
 from tabulate import tabulate
 from reliabpy.policy.policy import HeuristicRules
-from reliabpy.commons.post_processing import plot_system
+from reliabpy.commons.post_processing import OneEpisode
 
 import numpy as np
 
@@ -109,7 +109,7 @@ class SystemModel:
             step_results[component.id] = temp
         return step_results
 
-    def get_results(self):
+    def get_components_results(self):
         system = dict()
         for component in self.components_list:
             temp = component.get_results()
@@ -123,7 +123,7 @@ class SystemModel:
         self.cost_model.compute_cost_breakdown(self)
     
     def post_process(self, savefolder):
-        components_dict, system_pf = self.get_results()
-        plot_system(components_dict, system_pf, savefolder)
+        post = OneEpisode(self, savefolder)
+        post.plot_overview()
         
 
