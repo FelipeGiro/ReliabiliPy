@@ -30,8 +30,13 @@ class InspectionMaintenance:
 
                 system_obs[component.id]= np.array(comp_t)[component.obs]
                 system_action[component.id] = np.array(comp_t)[component.action]
+            
+            else:
+                system_obs[component.id]= list()
+                system_action[component.id] = list()
+
         
-        t_temp = np.unique(np.concatenate(list(system_obs.values())))
+        t_temp = np.unique(np.concatenate(list(system_obs.values()))).astype(int)
         C_C[t_temp] += self.c_c*(1 - self.r)**(t_temp)
         
         R_F[abs_t[1:]] = self.c_f*delta_pf*(1 - self.r)**abs_t[1:]
