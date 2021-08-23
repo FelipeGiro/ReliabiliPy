@@ -118,6 +118,7 @@ class SystemModel:
         
 
     def run(self, lifetime):
+        self.lifetime = lifetime
         for timestep in range(lifetime):
             self.forward_one_timestep()
         self.cost_model.compute_cost_breakdown(self)
