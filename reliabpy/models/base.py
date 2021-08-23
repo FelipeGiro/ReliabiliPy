@@ -43,25 +43,29 @@ class SystemModel:
                  system_dependancies = None,
                  cost_model = None):
         
+        self.components_reliability_models_list = components_reliability_models_list
         self.system_dependancies = system_dependancies
         self.cost_model = cost_model
+        self.policy_rules = policy_rules
+        self.policy_rules.import_model(self)
+
+        self._reset()
+    
+    def _reset(self):
         self.step_results = {}
         self.components_list = []
         self.t = 0
-        for component in components_reliability_models_list:
-
+        for component in self.components_reliability_models_list:
             _temp_Component = Component(
                 component, 
-                dcopy(components_reliability_models_list[component]['inference']),
-                components_reliability_models_list[component]['inspection']
+                dcopy(self.components_reliability_models_list[component]['inference']),
+                self.components_reliability_models_list[component]['inspection']
             )
             _temp_Component.store()
 
             self.components_list.append(_temp_Component)
             self.step_results[_temp_Component.id] = _temp_Component.last_results
         
-        self.policy_rules = policy_rules
-        self.policy_rules.import_model(self)
         self.system_pf = [self._system_reliability()]
     
     
