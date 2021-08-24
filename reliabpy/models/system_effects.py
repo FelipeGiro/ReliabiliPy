@@ -58,12 +58,42 @@ def comp_k_out_of_n(pf, k):
     return PF_sys   
 
 class System_of_Subsystems:
+    """
+    System of Subsystems
+    ====================
+
+    Separate all systems components in k-out-of-n susbsystems according to an 
+    assingment vector. Subsystems are in series.
+
+    Parameters:
+    -----------
+    assignments : array
+        array with subsystem assignment of each component.
+    k_list : array
+        list of k values of each subsystem.
+    """
     def __init__(self, assignments, k_list):
         self.assignments = np.array(assignments)
         self.k_list = np.array(k_list)
         self.zones = np.unique(self.assignments)
 
     def compute_system_pf(self, pf_list):
+        """
+        Compute system P_f
+        ==================
+
+        Compute system probability of failure.
+
+        Parameters:
+        -----------
+        pf_list : array
+            list of probabilities of failure of each component.
+        
+        Returns:
+        --------
+        pf_sys : float
+            probability of failure of th eentire system
+        """
         pf_list = np.array(pf_list)
         subsystem_pfs = []
         for zone, k in zip(self.zones, self.k_list):
