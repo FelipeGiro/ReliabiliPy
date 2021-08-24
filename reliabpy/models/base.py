@@ -4,7 +4,7 @@ from reliabpy.commons.post_processing import OneEpisode
 
 import numpy as np
 
-class Component:
+class ComponentLevel:
     """
     Component Level
     ===============
@@ -135,7 +135,7 @@ class SystemModel:
         self.components_list = []
         self.t = 0
         for component in self.components_reliability_models_list:
-            _temp_Component = Component(
+            _temp_Component = ComponentLevel(
                 component, 
                 dcopy(self.components_reliability_models_list[component]['inference']),
                 self.components_reliability_models_list[component]['inspection']
