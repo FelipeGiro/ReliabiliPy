@@ -2,6 +2,10 @@ import numpy as np
 from scipy.stats import norm
 from reliabpy.models.observation import Probability_of_Detection as PoD
 
+import numba
+import torch
+# import tensorflow as tf
+
 class _Base(object):
     def _global_init(self):
         self.store_results = True
@@ -253,6 +257,11 @@ class DynamicBayesianNetwork(_Base):
         =======
         
         Propagate one time step.
+
+        TODO: implement for benchmark:
+        - Numba
+        - PyTorch
+        - TensorFlow
         """
         self.t += 1
         self.s = np.dot(self.s, self.T)
