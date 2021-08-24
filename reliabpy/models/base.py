@@ -5,6 +5,22 @@ from reliabpy.commons.post_processing import OneEpisode
 import numpy as np
 
 class Component:
+    """
+    Component Level
+    ===============
+    
+    Class for reliability computation of one structural component only.
+
+    Parameters:
+    -----------
+    id : str
+        Identifier of the component
+    inference_model : intializated inference model class 
+        Initialized inferenece model (e.g.: Monte Carlo simulation or 
+        dynamic Bayesian network)
+    inspection : initilizated inspection model class
+        Initialized inspection model (e.g.: probability of detection)
+    """
     def __init__(self, id, inference_model, inspection):
         self.id = id
         self.inference_model = inference_model
@@ -12,6 +28,31 @@ class Component:
         self.t, self.pf, self.obs, self.action = list(), list(), list(), list()
 
     def store(self, obs = False, action = False):
+        """
+        Store (component level)
+        =======================
+        
+        Store the time, probabiility of failure, observation results, and action for current timestep.
+
+        Parameters:
+        -----------
+        obs : Any
+            Information about the component observation.
+        action : Any
+            Information about action on the component observation.
+        
+        Returns:
+        --------
+        t : int
+            Current timestep.
+        pf : float
+            Current probability of failure (for timestep t).
+        obs : any.
+            Current observation (for timestep t).
+        action : any
+            Curretn action (for timestep t).
+
+        """
         t      = self.inference_model.t
         pf     = self.inference_model.pf
         
@@ -25,6 +66,12 @@ class Component:
         return t, pf, obs, action
 
     def get_results(self, dtype="dict"):
+        """
+        Get results (component level)
+        =============================
+
+        Get the results for the components lifetime.
+        """
         if dtype == "dict":
             results = {"time" : self.t, "pf" : self.pf, "obs" : self.obs, "action" : self.action}
         return results
@@ -38,6 +85,23 @@ class Component:
         return datatype + comp_name + table
 
 class SystemModel:
+    """
+    System Level
+    ============
+
+    Class for reliability computation of the entire structural system.
+
+    Parameters:
+    -----------
+    components_reliability_models_list : list of initilizated Component Level class
+        List of all structural components models
+    policy_rules : policy rules initilizated class
+        Policy rules class 
+    system_dependancies : system dependency initilizated class
+        Dependancies model class
+    cost_model : cost model initilized class
+        Cost model class
+    """
     def __init__(self, components_reliability_models_list, 
                  policy_rules, 
                  system_dependancies = None,
@@ -52,6 +116,7 @@ class SystemModel:
         self._reset()
     
     def _reset(self):
+        # set all value as initial
         self.step_results = {}
         self.components_list = []
         self.t = 0
@@ -70,6 +135,13 @@ class SystemModel:
     
     
     def forward_one_timestep(self):
+        """
+        Foward one timestep
+        ===================
+        
+        Advance one time step for the system (all components). 
+        It included the update and the actions.
+        """
         self.t += 1
         ### for every component ###
         # prediction
@@ -122,12 +194,38 @@ class SystemModel:
         
 
     def run(self, lifetime):
+        """
+        Run model
+        =========
+
+        Run model for a given lifetime.
+
+        Parameters:
+        -----------
+        lifetime : int
+            Simulation horizon of the structural system.
+        """
         self.lifetime = lifetime
         for timestep in range(lifetime):
             self.forward_one_timestep()
         self.cost_model.compute_cost_breakdown(self)
     
     def post_process(self, savefolder, plot=True, excel=True):
+        """
+        Post-proccess
+        =============
+        
+        Export results in graphs and tables.
+
+        Parameters:
+        -----------
+        savefolder : path
+            Path with the folder to save the results. 
+        plot : bool
+            Save graphical results in PNG.
+        excel : bool
+            Save table results in Excel spreadsheets.
+        """
         post = OneEpisode(self, savefolder)
         if plot:
             post.plot_overview()
