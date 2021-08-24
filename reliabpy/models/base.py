@@ -98,7 +98,7 @@ class ComponentLevel:
             headers = "keys", tablefmt="pretty")
         return datatype + comp_name + table
 
-class SystemModel:
+class SystemLevel:
     """
     System Level
     ============

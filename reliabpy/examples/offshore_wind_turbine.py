@@ -1,4 +1,4 @@
-from reliabpy.models.base import SystemModel
+from reliabpy.models.base import SystemLevel
 from reliabpy.models.inference import DynamicBayesianNetwork 
 from reliabpy.policy.policy import HeuristicRules
 from reliabpy.models.system_effects import System_of_Subsystems
@@ -105,7 +105,7 @@ class Simple:
         zone_assingment = ['atm', 'atm', 'atm', 'atm', 'sub', 'sub', 'sub', 'sub', 'bur', 'bur', 'bur', 'bur']
         zone_k = [3,3,3]
 
-        self.monopile = SystemModel(
+        self.monopile = SystemLevel(
             components_reliability_models_list, 
             policy_rules = HeuristicRules(delta_t = 5, nI = 3),
             system_dependancies = System_of_Subsystems(zone_assingment, zone_k),
