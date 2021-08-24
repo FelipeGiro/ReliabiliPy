@@ -170,9 +170,8 @@ class MonteCarloSimulation(_Base):
 
         return failed_detected/total
 
-# TODO: Transition matrix class
-# write a class to built the transiton matrix for DBN from a given function. 
 class TransitionMatrix:
+    # TODO: Transition matrix class
     """
     Transtion Matrix
     ================
