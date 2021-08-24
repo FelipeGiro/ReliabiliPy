@@ -191,8 +191,19 @@ class SystemModel:
         pf_list = [x['pf'] for x in step_results]
         return (self.t, self.system_dependancies.compute_system_pf(pf_list))
          
-    
     def get_step_results(self):
+        # TODO: check if this function can be deleted
+        """
+        Get step results
+        ================
+
+        Get the current state of every component in the system.
+
+        Return:
+        -------
+        step_results : list
+            List of Component Level current results.
+        """
         step_results = dict()
         for component in self.components_list:
             temp = component.last_results
@@ -200,13 +211,25 @@ class SystemModel:
         return step_results
 
     def get_components_results(self):
+        """
+        Get step results
+        ================
+
+        Get the current state of every component in the system.
+
+        Return:
+        -------
+        step_results : list
+            List of Component Level current results.
+        system_pf : float
+            system probability of failure
+        """
         system = dict()
         for component in self.components_list:
             temp = component.get_results()
             system[component.id] = temp
         return system, self.system_pf
         
-
     def run(self, lifetime):
         """
         Run model
