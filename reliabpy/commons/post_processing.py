@@ -4,12 +4,34 @@ import os
 import pandas as pd
 
 class OneEpisode:
+    """
+    Processing for one episode
+    ==========================
+    
+    Class focused in processing results for just one episode.
+
+    Parameters:
+    system_model : system model object
+        System model after the simulation.
+    savefolder : path
+        Save folder to save all results.
+    """
     def __init__(self, system_model, savefolder=False):
         self.system_model = system_model
         self.savefolder = savefolder
 
     def plot_overview(self):
+        """
+        Plot overview
+        =============
 
+        Show or save a figure with three plots:
+        1) Probability of failure of all components.
+        2) Probability of failure of the entire structural system.
+        3) Cost breakdown.
+
+        Where abscissas are the timestep in years. 
+        """
         components_dict, system_pf = self.system_model.get_components_results()
 
         fig, axes = plt.subplots(3, figsize=(10,10), sharex=True)
@@ -41,6 +63,15 @@ class OneEpisode:
             plt.plot()
 
     def to_excel(self):
+        """
+        Save to excel
+        =============
+
+        Save the results in a Excel spreadsheet with the tabs:
+        - CostBreakdown : yearly cost breakdown
+        - ObservationMap : time and location of observations on components
+        - ActionMap : time and location of actions on components 
+        """
         df_costs = pd.DataFrame(self.system_model.yearly_costs_breakdown)
         df_costs.set_index('t', inplace=True)
 
@@ -59,14 +90,9 @@ class OneEpisode:
         writer.save()
 
     def _build_map(self, comp_dict, index):
-
         for key, value in comp_dict.items():
             base_array = np.zeros_like(index, dtype=bool)
             base_array[value] = True
             comp_dict[key] = base_array
         
         return comp_dict
-
-# TODO: a function to transform the computed data in DataFrame
-    
-
