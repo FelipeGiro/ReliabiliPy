@@ -2,8 +2,6 @@ import numpy as np
 from scipy.stats import norm
 from reliabpy.models.observation import Probability_of_Detection as PoD
 
-# TODO: documentation
-
 class _Base(object):
     def _global_init(self):
         self.store_results = True
@@ -22,18 +20,46 @@ class _Base(object):
                 self.action
                 ])
 
-
     def get_pf(self):
-        
+        """
+        Get P_f
+        =======
+
+        Get the probability of failure and its timestep.
+        Needs model with <store_results = True>.
+
+        Return:
+        -------
+        time : array
+            time for the pf
+        pf : array
+            probability of failure
+        """
+        # Get the probability of failure. Needs <store_results = True>
         if not self.store_results:
             raise Warning("No stored probability of failure: store_results is", self.store_results)
         
         results = np.array(self.results)
-        time, pfs = results[:,0], results[:,1]
+        time, pf = results[:,0], results[:,1]
 
-        return time, pfs
+        return time, pf
     
     def get_results(self):
+        """
+        Get results
+        ===========
+        
+        Return a dictionary with the results for the entire episode: 
+        - year   : year
+        - pf     : probability of failure
+        - obs    : observation
+        - action : action on a component
+
+        Return:
+        -------
+        results : dict
+            year, pf, obs, action
+        """
 
         if not self.store_results:
             raise Warning("No stored probability of failure: store_results is", self.store_results)
@@ -42,10 +68,20 @@ class _Base(object):
 
         return {"year" : results[:,0], "pf" : results[:,1], "obs" : results[:,2], "action" : results[:,3]}
 
-        
-        
-
 class MonteCarloSimulation(_Base):
+    """
+    Monte Carlo Simulation
+    ======================
+
+    Parameters:
+    -----------
+    a_0 : array
+        initial crack size of the samples
+    function : function
+        funtion to propagate over time with <a> only as an input 
+    a_crit : float
+        critical crack depth
+    """
     def __init__(self, a_0, function, a_crit):
         self._global_init()
 
@@ -69,12 +105,31 @@ class MonteCarloSimulation(_Base):
                 None]]
 
     def predict(self):
+        """
+        Predict
+        =======
+        
+        Propagate one time step.
+        """
         self.a = self.f()
         self.t += 1
 
         if self.store_results: self._store_results()
 
     def update(self, parameters):
+        """
+        Update
+        ======
+
+        Update the current state with (so far) Probability of Detection inspection model.
+
+        TODO: check this restriction for only PoD
+
+        Parameters:
+        -----------
+        parameters : dict
+            inspection parameters. so far, with only "quality" key (good, normal and bad)
+        """
         self.obs = 'PoD'
         parameters, invPoD_func = PoD.get_settings(parameters['quality'], inverse=True)
 
@@ -97,6 +152,17 @@ class MonteCarloSimulation(_Base):
         if self.store_results: self._store_results()
 
     def get_prob_fail(self):
+        """
+        Get probability of failure
+        ==========================
+
+        Get the probability of failure for the current timestep
+
+        Returns
+        -------
+        pf : float
+            current probability of failure
+        """
         failed_samples = self.a > self.a_crit
 
         total = self.PoD.sum()
@@ -107,19 +173,52 @@ class MonteCarloSimulation(_Base):
 # TODO: Transition matrix class
 # write a class to built the transiton matrix for DBN from a given function. 
 class TransitionMatrix:
-    def __init__(self):
-        pass
+    """
+    Transtion Matrix
+    ================
+    
+    Build the transtion matrix for a given function and discretization scheme.
 
-    def initialize(self, discretization, function):
-        pass
+    Parameters:
+    -----------
+    discretization : array
+        initial state vector (& x n)
+    function : function
+        propagation function over time: f(a)
+    """
+    def __init__(self, discretization, function):
+        self.discretization = discretization
+        self.function = function
 
-    def built_T(self):
-        pass
+    def build_T(self):
+        """
+        Build T
+        =======
+
+        Build transtiion matrix.
+
+        Returns:
+        --------
+        T : matrix
+            transtion matrix
+        """
+        return T
 
 class DynamicBayesianNetwork(_Base):
     '''
     Component level dynamic Bayesian network
     ========================================
+
+    Dynamic Bayesian nework for one component.
+
+    Parameters:
+    -----------
+    T : matrix
+        (n x n) transtiion matrix
+    s0 : array
+        initial state vector (1 x n)
+    discretization : dict
+        discretization of all variables (e.g.: crack depth and time) 
     '''
     
     def __init__(self, T, s0, discretizations):
@@ -149,6 +248,12 @@ class DynamicBayesianNetwork(_Base):
                 self.action]]
 
     def predict(self):
+        """
+        Predict
+        =======
+        
+        Propagate one time step.
+        """
         self.t += 1
         self.s = np.dot(self.s, self.T)
         self.obs, self.action = None, None
@@ -156,7 +261,20 @@ class DynamicBayesianNetwork(_Base):
         
         if self.store_results: self._store_results()
     
-    def update(self, insp_quality): # TODO: do it more general
+    def update(self, insp_quality):
+        """
+        Update
+        ======
+
+        Update the current state with (so far) Probability of Detection inspection model.
+
+        TODO: check this restriction for only PoD
+
+        Parameters:
+        -----------
+        parameters : dict
+            inspection parameters. so far, with only "quality" key (good, normal and bad)
+        """
         self.model = 'PoD'
 
         parameters, function = PoD.get_settings(insp_quality)
@@ -184,6 +302,12 @@ class DynamicBayesianNetwork(_Base):
         if self.store_results: self._store_results()
     
     def perform_action(self):
+        """
+        Perform action
+        ==============
+
+        Perform perfect repair action.
+        """
         if self.crack_detected:
             self.action = 'perfect_repair'
             self.s = self.s0
@@ -191,6 +315,17 @@ class DynamicBayesianNetwork(_Base):
         if self.store_results: self._store_results()
         
     def get_prob_fail(self):
+        """
+        Get probability of failure
+        ==========================
+
+        Get the probability of failure for the current timestep
+
+        Returns
+        -------
+        pf : float
+            current probability of failure
+        """
         s = self._reorder()
         return s.sum(axis=0)[-1]
 
@@ -202,7 +337,31 @@ class DynamicBayesianNetwork(_Base):
         return np.diff(function(**dist_params))/np.diff(discretization)
 
 class metrics:
+    """
+    Metrics
+    =======
+    
+    Metric functions for performance comparisons.
+    """
     def pf_rmse(model_1, model_2):
+        """
+        RMSE for P_f
+        ============
+
+        Root mean square error for the probability of failure of two models
+
+        Parameters:
+        -----------
+        model_1 : inference model
+            inference model
+        model_2 : inference model
+            inference model
+
+        Returns:
+        --------
+        rmse : float
+            Root mean square
+        """
         pf1 = model_1.get_pf()[1]
         pf2 = model_2.get_pf()[1]
 
