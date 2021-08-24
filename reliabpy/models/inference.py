@@ -201,6 +201,7 @@ class TransitionMatrix:
         T : matrix
             transtion matrix
         """
+        T = None
         return T
 
 class DynamicBayesianNetwork(_Base):
