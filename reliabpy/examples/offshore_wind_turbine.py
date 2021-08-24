@@ -29,6 +29,17 @@ class Simple:
         self.output_folder = output_folder
 
     def mount_model(self):
+        """
+        Mount model
+        ===========
+        
+        Mount the entire model and submodels (with inputs parameters already setup).
+
+        Returns:
+        --------
+        model : Initialized system model
+            System model for the offshroe wind turbine.
+        """
         atmosphetic_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "atm\\dr_OUT.mat"))
         submerged_zone__inputs = import_DBN_input_data(os.path.join(self.input_folder, "sub\\dr_OUT.mat"))
         buried_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "bur\\dr_OUT.mat"))
@@ -104,11 +115,27 @@ class Simple:
         return self.monopile
 
     def run_one_episode(self):
+        """
+        Run one episode
+        ===============
+
+        Run model for a lifetime of 20 years.
+
+        Return:
+        -------
+        cost_breakdown : dict
+            Dicionary with the cost breakdown:
+                C_C : campain costs
+                C_I : inspection costs
+                C_R : repair costs
+                R_F : risk of failure
+        """
         self.monopile.run(lifetime=20)
         return self.monopile.cost_breakdown
     
     @staticmethod
     def optimize_heuristic_based_policy(self, n_samples= 10000):
+        # TODO or to exclude: policy optimization
         n_samples
 
     
