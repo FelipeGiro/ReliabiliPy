@@ -64,6 +64,20 @@ class Component:
         self.action.append(action) 
 
         return t, pf, obs, action
+    
+    def forward_one_timestep(self):
+        # TODO: get inference call from system level class and put here
+        """
+        Foward one timestep (component level)
+        =====================================
+        
+        Advance one time step for the component. 
+        It included the update and the actions.
+        """
+        # prediction
+        # update
+        # repair
+        pass
 
     def get_results(self, dtype="dict"):
         """
@@ -136,8 +150,8 @@ class SystemModel:
     
     def forward_one_timestep(self):
         """
-        Foward one timestep
-        ===================
+        Foward one timestep (system level)
+        ==================================
         
         Advance one time step for the system (all components). 
         It included the update and the actions.
@@ -146,7 +160,7 @@ class SystemModel:
         ### for every component ###
         # prediction
         for component in self.components_list:
-            component.inference_model.predict()
+            component.inference_model.predict() # TODO: put this in the Component Level class
             component.store()
             self.step_results = self.get_step_results()
         self.system_pf.append(self._system_reliability())
@@ -157,7 +171,7 @@ class SystemModel:
             if len(self.to_inspect) is not 0:
                 for i in self.to_inspect:
                     component = self.components_list[i]
-                    component.inference_model.update(component.inspection)
+                    component.inference_model.update(component.inspection) # TODO: put this in the Component Level class 
                     component.store(obs=True)
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
