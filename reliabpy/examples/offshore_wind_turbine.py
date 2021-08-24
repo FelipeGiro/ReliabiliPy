@@ -9,6 +9,21 @@ from reliabpy.readwrite.ANAST import import_DBN_input_data
 import os
 
 class Simple:
+    """
+    Simple model
+    ============
+
+    Simple model for an offshore wind turbine with 12 component equally
+    distributed into 3 deterioration zones: atmospheric, submerged, and 
+    burried. 
+    
+    Models used:
+    - Inference: dynamic Bayesian network.
+    - Observation: probability of inspection.
+    - Action : perfect repair.
+    - System dependencies : series system of k-out-of-n subsystems.
+    - Cost model: for inspetion and maintenance.
+    """
     def __init__(self, input_folder="C:\\Developments\\reliabpy\PhD\\transition_matrices", output_folder="C:\\Developments\\reliabpy\\PhD\examples"):
         self.input_folder = input_folder
         self.output_folder = output_folder
