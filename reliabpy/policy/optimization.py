@@ -48,7 +48,7 @@ class HeuristicBased:
             
             if opt_cost > total_cost:
                 opt_cost = total_cost
-                print(f"Best policy so far: delta_t : {delta_t} | nI : {nI} | total_cost : {opt_cost}")
+                print(f"{datetime.now()} - Best policy so far: delta_t : {delta_t} | nI : {nI} | total_cost : {opt_cost}")
 
             pickle.dump(policy_result, outfile)
                 
