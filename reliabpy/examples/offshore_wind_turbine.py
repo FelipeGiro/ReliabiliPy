@@ -133,6 +133,9 @@ class Simple:
         self.monopile.run(lifetime=20)
         return self.monopile.cost_breakdown
     
+    def save_results(self, savefolder = None):
+        if savefolder is not None:
+            self.monopile.post_process(savefolder)
     @staticmethod
     def optimize_heuristic_based_policy(self, n_samples= 10000):
         # TODO or to exclude: policy optimization
@@ -143,3 +146,4 @@ if __name__ == '__main__':
     model = Simple()
     model.mount_model()
     model.run_one_episode()
+    model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
