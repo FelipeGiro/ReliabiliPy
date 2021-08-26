@@ -114,7 +114,7 @@ class Simple:
 
         return self.monopile
 
-    def run_one_episode(self):
+    def run_one_episode(self, post_proccess=True):
         """
         Run one episode
         ===============
@@ -131,6 +131,9 @@ class Simple:
                 R_F : risk of failure
         """
         self.monopile.run(lifetime=20)
+
+        if post_proccess:
+            self.monopile.post_process("C:\\Developments\\reliabpy\\PhD\\examples")
         return self.monopile.cost_breakdown
     
     @staticmethod

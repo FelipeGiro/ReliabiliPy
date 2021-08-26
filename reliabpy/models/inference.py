@@ -2,9 +2,9 @@ import numpy as np
 from scipy.stats import norm
 from reliabpy.models.observation import Probability_of_Detection as PoD
 
-import numba
-import torch
-# import tensorflow as tf
+import tensorflow as tf
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 class _Base(object):
     def _global_init(self):
@@ -228,9 +228,9 @@ class DynamicBayesianNetwork(_Base):
     def __init__(self, T, s0, discretizations):
         self._global_init()
 
-        self.T = T
-        self.s = s0
-        self.s0 = s0.copy()
+        self.T = tf.convert_to_tensor(T)
+        self.s = tf.convert_to_tensor(s0)
+        self.s0 = tf.convert_to_tensor(s0.copy())
         self.discretizations = discretizations
 
         self.states_values = np.diff(discretizations['a']/2) + discretizations['a'][:-1]
@@ -264,7 +264,7 @@ class DynamicBayesianNetwork(_Base):
         - TensorFlow
         """
         self.t += 1
-        self.s = np.dot(self.s, self.T)
+        self.s = tf.matmul(self.s, self.T)
         self.obs, self.action = None, None
         self.pf = self.get_prob_fail()
         
@@ -290,9 +290,10 @@ class DynamicBayesianNetwork(_Base):
         obs_pmf = function(self.states_values, **parameters)
 
         obs_state = np.tile(obs_pmf, int(self.total_nstates/len(obs_pmf)))
+        obs_state = tf.convert_to_tensor(obs_state)
         detected_pmf = self.s*obs_state
 
-        self.crack_detected = bool(np.random.binomial(1, detected_pmf.sum()))
+        self.crack_detected = bool(np.random.binomial(1, tf.reduce_sum(detected_pmf).numpy()))
         if any([self.force_detection, self.force_notdetection]):
             if self.force_detection:
                 self.s = detected_pmf
@@ -304,7 +305,7 @@ class DynamicBayesianNetwork(_Base):
             else:
                 self.s = self.s*(1 - obs_state)
 
-        self.s /= self.s.sum()
+        self.s /= tf.reduce_sum(self.s)
         self.obs, self.action = None, None
         self.pf = self.get_prob_fail()
         
@@ -336,10 +337,10 @@ class DynamicBayesianNetwork(_Base):
             current probability of failure
         """
         s = self._reorder()
-        return s.sum(axis=0)[-1]
+        return tf.reduce_sum(s, 0).numpy()[-1]
 
     def _reorder(self):
-        return self.s.reshape(list(self.n_states.values()))
+        return tf.reshape(self.s, list(self.n_states.values()))
     
     def _discretize(discretization, dist_params, function):
         dist_params['a'] = discretization
