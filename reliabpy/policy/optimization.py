@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import product
 from datetime import datetime, timedelta
+import time
 import pickle
 import os
 
@@ -23,17 +24,17 @@ class HeuristicBased:
             self.policies.append((delta_t, nI))
             i += 1
             print(f'- {i}: Delta_t : {delta_t} years | nI : {nI} | n_samples : {n_samples}')
-        total_samples = i*n_samples
-        expected_time = timedelta(seconds=total_samples*0.16)
-        print(f"Optimization with {total_samples} samples | Expected computationtime : {expected_time}")
+        self.left_samples = i*n_samples
+        print('Total number of samples:', self.left_samples)
         input('Press enter to continue... ')
-    
+        
     def run(self):
         self.start_time = datetime.now()
         print(f"=== start of simulation : {self.start_time} ===")
         opt_cost = np.inf
         outfile = open(os.path.join(self.save_folder, f"policies_results.pickle"), 'wb')
         for delta_t, nI in self.policies:
+            start = datetime.now()
             policy = HeuristicRules(delta_t, nI)
             policy.import_model(self.model.monopile)
             self.model.monopile.policy_rules = policy
@@ -51,6 +52,12 @@ class HeuristicBased:
                 print(f"{datetime.now()} - Best policy so far: delta_t : {delta_t} | nI : {nI} | total_cost : {opt_cost}")
 
             pickle.dump(policy_result, outfile)
+
+            end = datetime.now()
+            self.left_samples -= self.n_samples
+            episode_time = (end - start)/self.n_samples
+            print(f'- Mean episode time: {episode_time} | Remaining time: {episode_time*self.left_samples}')
+            print('\t Expect to finish at:', datetime.now() - episode_time*self.left_samples)
                 
         self.end_time = datetime.now()
         print(f"=== end of simulation : {self.end_time} ===")
