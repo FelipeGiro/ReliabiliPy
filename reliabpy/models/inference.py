@@ -2,6 +2,8 @@ import numpy as np
 from scipy.stats import norm
 from reliabpy.models.observation import Probability_of_Detection as PoD
 
+import torch
+
 class _Base(object):
     def _global_init(self):
         self.store_results = True
@@ -224,9 +226,9 @@ class DynamicBayesianNetwork(_Base):
     def __init__(self, T, s0, discretizations):
         self._global_init()
 
-        self.T = T
-        self.s = s0
-        self.s0 = s0.copy()
+        self.T = torch.Tensor(T)
+        self.s = torch.Tensor(s0)
+        self.s0 = torch.Tensor(s0.copy())
         self.discretizations = discretizations
 
         self.states_values = np.diff(discretizations['a']/2) + discretizations['a'][:-1]
@@ -255,7 +257,7 @@ class DynamicBayesianNetwork(_Base):
         Propagate one time step.
         """
         self.t += 1
-        self.s = np.dot(self.s, self.T)
+        self.s = torch.matmul(self.s, self.T)
         self.obs, self.action = None, None
         self.pf = self.get_prob_fail()
         
@@ -281,7 +283,8 @@ class DynamicBayesianNetwork(_Base):
         obs_pmf = function(self.states_values, **parameters)
 
         obs_state = np.tile(obs_pmf, int(self.total_nstates/len(obs_pmf)))
-        detected_pmf = self.s*obs_state
+        obs_state = torch.Tensor(obs_state)
+        detected_pmf = torch.mul(self.s, obs_state)
 
         self.crack_detected = bool(np.random.binomial(1, detected_pmf.sum()))
         if any([self.force_detection, self.force_notdetection]):
