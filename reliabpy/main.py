@@ -1,10 +1,5 @@
 from reliabpy.examples.offshore_wind_turbine import Simple
 
-def run():
-    model = Simple()
-    model.mount_model()
-    model.run_one_episode()
-
 if __name__ == '__main__':
     import cProfile, pstats
     import subprocess
