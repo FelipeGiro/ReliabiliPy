@@ -82,11 +82,29 @@ class OneEpisode:
         df_obs = pd.DataFrame(obs_map, index=df_costs.index)
         df_action = pd.DataFrame(action_map, index=df_costs.index)
 
+        # TODO: put this in another function
+        list_df, comp_names = list(), list()
+        for component in self.system_model.components_list:
+            comp_names.append(component.id)
+            t = np.array(component.t, dtype=float)
+            pf = component.pf
+            mask = np.append([False], ~(t[1:] - t[:-1]).astype(bool))
+            if any(mask):
+                add_sth = 0.000001
+                t[mask] += np.linspace(add_sth, add_sth*mask.sum(), num=mask.sum())
+                    
+            list_df.append(pd.DataFrame(data=pf, index=t, columns=['pf']))
+        list_df.append(pd.DataFrame(self.system_model.system_pf).set_index(0))
+        comp_names.append("SYSTEM")
+        df_pfs = pd.concat(list_df, axis=1, join='outer')
+        df_pfs.columns = comp_names
+
         writer = pd.ExcelWriter(os.path.join(self.savefolder, 'SystemReliability.xlsx'), engine='xlsxwriter')
 
         df_costs.to_excel(writer, sheet_name='Cost_Breakdown')
         df_obs.to_excel(writer, sheet_name='Observation_Map')
         df_action.to_excel(writer, sheet_name='Action_Map')
+        df_pfs.to_excel(writer, sheet_name='P_F')
         
         writer.save()
 
