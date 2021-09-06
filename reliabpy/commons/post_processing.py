@@ -1,4 +1,5 @@
 import numpy as np 
+import pickle
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
@@ -96,3 +97,18 @@ class OneEpisode:
             comp_dict[key] = base_array
         
         return comp_dict
+
+class MonteCarlo:
+    def __init__(self, folderpath):
+        all_policies = list()
+        with open(folderpath, 'rb') as file:
+            while True:
+                try:
+                    pickle_file = pickle.load(file)
+                    all_policies.append(pickle_file)
+                except EOFError:
+                    break
+        self.all_policies = all_policies
+
+if __name__ == '__main__':
+    test = MonteCarlo("C:\\Developments\\reliabpy\\PhD\\examples\\policies_results.pickle")
