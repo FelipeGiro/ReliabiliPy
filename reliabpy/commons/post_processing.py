@@ -104,7 +104,7 @@ class OneEpisode:
         df_costs.to_excel(writer, sheet_name='Cost_Breakdown')
         df_obs.to_excel(writer, sheet_name='Observation_Map')
         df_action.to_excel(writer, sheet_name='Action_Map')
-        df_pfs.to_excel(writer, sheet_name='P_F')
+        df_pfs.to_excel(writer, sheet_name='Prob_Failure')
         
         writer.save()
 
