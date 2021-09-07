@@ -19,7 +19,7 @@ class HeuristicBased:
         self.n_samples = n_samples
         self.left_samples = n_samples*len(self.policies)
         
-    def run(self):
+    def run_samples(self):
         
         self.start_time = datetime.now()
         self.save_folder = os.path.join(self.save_folder, self.start_time.strftime("%Y%m%d_%H%M%S_") + self.project_name)
@@ -37,7 +37,6 @@ class HeuristicBased:
             self.model.monopile.policy_rules = policy
 
             with open(os.path.join(self.save_folder, datetime.now().strftime("d%Y%m%dt%H%M%S") + f"__s_{self.n_samples}__deltat_{delta_t}__nI_{nI}"), 'wb') as outfile:
-                episodes = list()
                 for samples in range(self.n_samples):
                     pickle.dump(self.model.run_one_episode(), outfile)
                     self.model.monopile._reset()
@@ -59,6 +58,6 @@ if __name__ == '__main__':
     model.mount_model()
     opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples")
     opt.mount_policies_to_search(delta_t_array=[3,4,5,6,7,8,9,10,11,12,13,14,15,16], nI_array=[1,2,3,4,5,6,7,8], n_samples=25)
-    opt.run()
+    opt.run_samples()
 
     print()
