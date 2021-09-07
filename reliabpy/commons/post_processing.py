@@ -92,9 +92,15 @@ class OneEpisode:
             if any(mask):
                 add_sth = 0.000001
                 t[mask] += np.linspace(add_sth, add_sth*mask.sum(), num=mask.sum())
-                    
             list_df.append(pd.DataFrame(data=pf, index=t, columns=['pf']))
-        list_df.append(pd.DataFrame(self.system_model.system_pf).set_index(0))
+        system_pf = np.array(self.system_model.system_pf)
+        t = system_pf[:, 0]
+        pf = system_pf[:, 1]
+        list_df.append(pd.DataFrame(index = system_pf[:, 0], data = system_pf[:, 1]))
+        mask = np.append([False], ~(t[1:] - t[:-1]).astype(bool))
+        if any(mask):
+            add_sth = 0.000001
+            t[mask] += np.linspace(add_sth, add_sth*mask.sum(), num=mask.sum())
         comp_names.append("SYSTEM")
         df_pfs = pd.concat(list_df, axis=1, join='outer')
         df_pfs.columns = comp_names
