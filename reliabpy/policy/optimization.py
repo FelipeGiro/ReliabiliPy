@@ -32,30 +32,30 @@ class HeuristicBased:
     def run(self):
         
         self.start_time = datetime.now()
-        os.mkdir(os.path.join(self.save_folder, self.start_time.strftime("%Y%m%d_%H%M%S_") + self.project_name))
+        self.save_folder = os.path.join(self.save_folder, self.start_time.strftime("%Y%m%d_%H%M%S_") + self.project_name)
+        os.mkdir(self.save_folder)
 
         print(f"=== start of simulation : {self.start_time} ===")
         opt_cost = np.inf
-        outfile = open(os.path.join(self.save_folder, f"policies_results.pickle"), 'wb')
         for delta_t, nI in self.policies:
             start = datetime.now()
             policy = HeuristicRules(delta_t, nI)
             policy.import_model(self.model.monopile)
             self.model.monopile.policy_rules = policy
 
-            episodes = list()
-            for samples in range(self.n_samples):
-                episodes.append(list(self.model.run_one_episode().values()))
-                self.model.monopile._reset()
-            policy_costs = np.mean(episodes, axis=0)
-            total_cost = policy_costs.sum()
-            policy_result = delta_t, nI, self.n_samples, policy_costs, total_cost, np.std(episodes, axis=0), np.max(episodes, axis=0), np.min(episodes, axis=0)
-            
-            if opt_cost > total_cost:
-                opt_cost = total_cost
-                print(f"{datetime.now()} - Best policy so far: delta_t : {delta_t} | nI : {nI} | total_cost : {opt_cost}")
-
-            pickle.dump(policy_result, outfile)
+            with open(os.path.join(self.save_folder, datetime.now().strftime("d%Y%m%d_t%H%M%S") + f"_deltat{delta_t}_nI{nI}_s{self.n_samples}"), 'wb') as outfile:
+                episodes = list()
+                for samples in range(self.n_samples):
+                    episodes.append(list(self.model.run_one_episode().values()))
+                    self.model.monopile._reset()
+                    pickle.dump(policy_result, outfile)
+                policy_costs = np.mean(episodes, axis=0)
+                total_cost = policy_costs.sum()
+                policy_result = delta_t, nI, self.n_samples, policy_costs, total_cost, np.std(episodes, axis=0), np.max(episodes, axis=0), np.min(episodes, axis=0)
+                
+                if opt_cost > total_cost:
+                    opt_cost = total_cost
+                    print(f"{datetime.now()} - Best policy so far: delta_t : {delta_t} | nI : {nI} | total_cost : {opt_cost}")
 
             end = datetime.now()
             self.left_samples -= self.n_samples
