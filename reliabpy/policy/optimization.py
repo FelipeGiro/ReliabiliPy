@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import time
 import pickle
 import os
+from tabulate import tabulate
 
 from reliabpy.policy.policy import HeuristicRules
 
@@ -14,20 +15,9 @@ class HeuristicBased:
         self.project_name = project_name
     
     def mount_policies_to_search(self, delta_t_array, nI_array, n_samples):
-        combinations = product(delta_t_array, nI_array)
-        self.policies = []
+        self.policies = list(product(delta_t_array, nI_array))
         self.n_samples = n_samples
-
-        print("Policies to search")
-        print("==================")
-        i = 0
-        for delta_t, nI in combinations:
-            self.policies.append((delta_t, nI))
-            i += 1
-            print(f'- {i}: Delta_t : {delta_t} years | nI : {nI} | n_samples : {n_samples}')
-        self.left_samples = i*n_samples
-        print('Total number of samples:', self.left_samples)
-        input('Press enter to continue... ')
+        self.left_samples = n_samples*len(self.policies)
         
     def run(self):
         
@@ -35,33 +25,28 @@ class HeuristicBased:
         self.save_folder = os.path.join(self.save_folder, self.start_time.strftime("%Y%m%d_%H%M%S_") + self.project_name)
         os.mkdir(self.save_folder)
 
+        with open(os.path.join(self.save_folder, "_input.txt"), 'w') as input_reg:
+            input_txt = tabulate(self.policies, headers=['Delta_t', 'nI'])
+            input_reg.write(input_txt)
+
         print(f"=== start of simulation : {self.start_time} ===")
-        opt_cost = np.inf
         for delta_t, nI in self.policies:
             start = datetime.now()
             policy = HeuristicRules(delta_t, nI)
             policy.import_model(self.model.monopile)
             self.model.monopile.policy_rules = policy
 
-            with open(os.path.join(self.save_folder, datetime.now().strftime("d%Y%m%d_t%H%M%S") + f"_deltat{delta_t}_nI{nI}_s{self.n_samples}"), 'wb') as outfile:
+            with open(os.path.join(self.save_folder, datetime.now().strftime("d%Y%m%dt%H%M%S") + f"__s_{self.n_samples}__deltat_{delta_t}__nI_{nI}"), 'wb') as outfile:
                 episodes = list()
                 for samples in range(self.n_samples):
-                    episodes.append(list(self.model.run_one_episode().values()))
+                    pickle.dump(self.model.run_one_episode(), outfile)
                     self.model.monopile._reset()
-                    pickle.dump(policy_result, outfile)
-                policy_costs = np.mean(episodes, axis=0)
-                total_cost = policy_costs.sum()
-                policy_result = delta_t, nI, self.n_samples, policy_costs, total_cost, np.std(episodes, axis=0), np.max(episodes, axis=0), np.min(episodes, axis=0)
-                
-                if opt_cost > total_cost:
-                    opt_cost = total_cost
-                    print(f"{datetime.now()} - Best policy so far: delta_t : {delta_t} | nI : {nI} | total_cost : {opt_cost}")
 
             end = datetime.now()
             self.left_samples -= self.n_samples
             episode_time = (end - start)/self.n_samples
             print(f'- Mean episode time: {episode_time} | Remaining time: {episode_time*self.left_samples}')
-            print('\t Expect to finish at:', datetime.now() - episode_time*self.left_samples)
+            print('\t Expect to finish at:', datetime.now() + episode_time*self.left_samples)
                 
         self.end_time = datetime.now()
         print(f"=== end of simulation : {self.end_time} ===")
@@ -73,7 +58,7 @@ if __name__ == '__main__':
     model = Simple()
     model.mount_model()
     opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples")
-    opt.mount_policies_to_search(delta_t_array=[3,4,5,6,7,8,9,10,11,12,13,14,15,16], nI_array=[1,2,3,4,5,6,7,8], n_samples=10000)
+    opt.mount_policies_to_search(delta_t_array=[3,4,5,6,7,8,9,10,11,12,13,14,15,16], nI_array=[1,2,3,4,5,6,7,8], n_samples=25)
     opt.run()
 
     print()
