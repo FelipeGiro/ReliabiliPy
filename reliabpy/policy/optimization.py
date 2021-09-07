@@ -8,9 +8,11 @@ import os
 from reliabpy.policy.policy import HeuristicRules
 
 class HeuristicBased:
-    def __init__(self, model, save_folder):
+    def __init__(self, model, save_folder, project_name = 'optimization'):
         self.model = model
-        self.save_folder = save_folder
+        self.save_folder = os.path.join(save_folder, datetime.now().strftime("%Y%m%d_%H%M%S_") + project_name)
+
+        os.makedir(self.save_folder)
     
     def mount_policies_to_search(self, delta_t_array, nI_array, n_samples):
         combinations = product(delta_t_array, nI_array)
