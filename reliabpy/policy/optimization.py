@@ -4,7 +4,10 @@ from datetime import datetime, timedelta
 import time
 import pickle
 import os
+from glob import glob
 from tabulate import tabulate
+import copy
+import pandas as pd
 
 from reliabpy.policy.policy import HeuristicRules
 
@@ -36,9 +39,10 @@ class HeuristicBased:
             policy.import_model(self.model.monopile)
             self.model.monopile.policy_rules = policy
 
-            with open(os.path.join(self.save_folder, datetime.now().strftime("d%Y%m%dt%H%M%S") + f"__s_{self.n_samples}__deltat_{delta_t}__nI_{nI}"), 'wb') as outfile:
+            with open(os.path.join(self.save_folder, datetime.now().strftime("d%Y%m%dt%H%M%S") + f"__s_{self.n_samples}__deltat_{delta_t}__nI_{nI}.npy"), 'wb') as outfile:
                 for samples in range(self.n_samples):
-                    pickle.dump(self.model.run_one_episode(), outfile)
+                    sample_results = self.model.run_one_episode()
+                    pickle.dump(sample_results, outfile)
                     self.model.monopile._reset()
 
             end = datetime.now()
@@ -51,13 +55,40 @@ class HeuristicBased:
         print(f"=== end of simulation : {self.end_time} ===")
         print(f"Elsapsed time : {self.end_time - self.start_time}")
 
+    def process_data(self, load_folder=None):
+        if load_folder is None:
+            self.load_folder = self.save_folder
+        else:
+            self.load_folder =  load_folder
+        
+        output_path_list = glob(os.path.join(self.load_folder, '*.npy'))
+        writer = pd.ExcelWriter(os.path.join(self.load_folder, 'OptimizarionResults.xlsx'), engine='xlsxwriter')
+        for output_path in output_path_list:
+            # getting the policy parameters
+            policy_dict = dict()
+            for temp in os.path.basename(os.path.splitext(output_path)[0]).split('__')[1:]:
+                variable, value = temp.split('_')
+                policy_dict[variable] = float(value)
+
+            policy_samples = []
+            with open(output_path, "rb") as f:
+                while True:
+                    try:
+                        policy_samples.append(pickle.load(f))
+                    except EOFError:
+                        break
+            delta_t, nI = int(policy_dict['deltat']), int(policy_dict['nI'])
+            df_temp = pd.DataFrame(policy_samples)
+            df_temp.to_excel(writer, sheet_name=f't {delta_t} nI {nI}')
+        writer.save()
 if __name__ == '__main__':
     from reliabpy.examples.offshore_wind_turbine import Simple 
 
     model = Simple()
     model.mount_model()
     opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples")
-    opt.mount_policies_to_search(delta_t_array=[3,4,5,6,7,8,9,10,11,12,13,14,15,16], nI_array=[1,2,3,4,5,6,7,8], n_samples=25)
+    opt.mount_policies_to_search(delta_t_array=[5,10,15], nI_array=[2,4,8], n_samples=25)
     opt.run_samples()
+    opt.process_data()
 
     print()
