@@ -191,8 +191,7 @@ class SystemLevel:
         pf_list = [x['pf'] for x in step_results]
         return (self.t, self.system_dependancies.compute_system_pf(pf_list))
          
-    def get_step_results(self):
-        # TODO: check if this function can be deleted
+    def get_step_results(self, variable_name=False):
         """
         Get step results
         ================
@@ -201,12 +200,17 @@ class SystemLevel:
 
         Return:
         -------
+        variable_name : str
+            it can assume 't' for time step, 'pf' for the probability of 
+            failure, 'obs' for observation result, 'action' for action taken
         step_results : list
             List of Component Level current results.
         """
         step_results = dict()
         for component in self.components_list:
             temp = component.last_results
+            if variable_name:
+                temp = temp[variable_name]
             step_results[component.id] = temp
         return step_results
 
