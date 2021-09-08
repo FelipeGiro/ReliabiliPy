@@ -25,9 +25,9 @@ class ComponentLevel:
         self.id = id
         self.inference_model = inference_model
         self.inspection = inspection
-        self.t, self.pf, self.obs, self.action = list(), list(), list(), list()
+        self.t, self.pf, self.action, self.obs = list(), list(), list(), list()
 
-    def store(self, obs = False, action = False):
+    def store(self, action = False, obs = False):
         """
         Store (component level)
         =======================
@@ -60,8 +60,8 @@ class ComponentLevel:
 
         self.t.append(t) 
         self.pf.append(pf) 
-        self.obs.append(obs) 
         self.action.append(action) 
+        self.obs.append(obs) 
 
         return t, pf, obs, action
     
@@ -87,14 +87,14 @@ class ComponentLevel:
         Get the results for the components lifetime.
         """
         if dtype == "dict":
-            results = {"time" : self.t, "pf" : self.pf, "obs" : self.obs, "action" : self.action}
+            results = {"time" : self.t, "pf" : self.pf, "action" : self.action, "obs" : self.obs}
         return results
 
     def __str__(self):
         datatype = "DataType: StructuralComponent\n===============================\n"
         comp_name = f"- Component name: <<{self.name}>>\n"
         table = "- Results table\n" + tabulate(
-            {"time" : self.t, "pf" : self.pf, "obs" : self.obs, "action" : self.action},
+            {"time" : self.t, "pf" : self.pf, "action" : self.action, "obs" : self.obs},
             headers = "keys", tablefmt="pretty")
         return datatype + comp_name + table
 
