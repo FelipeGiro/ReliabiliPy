@@ -202,7 +202,7 @@ class SystemLevel:
         -------
         variable_name : str
             it can assume 't' for time step, 'pf' for the probability of 
-            failure, 'obs' for observation result, 'action' for action taken
+            failure, 'action' for action taken, 'obs' for observation result 
         step_results : list
             List of Component Level current results.
         """
