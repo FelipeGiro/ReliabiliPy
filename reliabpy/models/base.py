@@ -75,7 +75,7 @@ class ComponentLevel:
         self.inference_model.update(self.inspection) 
         if store: self.store()
 
-    def action(self, store=True):
+    def perform_action(self, store=True):
         self.inference_model.perform_action() 
         if store: self.store()
 
@@ -160,8 +160,7 @@ class SystemLevel:
         ### for every component ###
         # prediction
         for component in self.components_list:
-            component.inference_model.predict() # TODO: put this in the Component Level class
-            component.store()
+            component.predict()
             self.step_results = self.get_step_results()
         self.system_pf.append(self._system_reliability())
         
@@ -170,9 +169,7 @@ class SystemLevel:
             self.to_inspect = self.policy_rules.to_observe()
             if len(self.to_inspect) is not 0:
                 for i in self.to_inspect:
-                    component = self.components_list[i]
-                    component.inference_model.update(component.inspection) # TODO: put this in the Component Level class 
-                    component.store()
+                    self.components_list[i].update()
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
 
@@ -180,9 +177,7 @@ class SystemLevel:
             self.to_repair = self.policy_rules.to_repair()
             if len(self.to_repair) is not 0:
                 for i in self.to_repair:
-                    component = self.components_list[i]
-                    component.inference_model.perform_action() # TODO: put this in the Component Level class 
-                    component.store()
+                    self.components_list[i].perform_action()
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
 
