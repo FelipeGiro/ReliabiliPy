@@ -125,12 +125,11 @@ class ComponentLevel:
         return results
 
     def __str__(self):
-        datatype = "DataType: StructuralComponent\n===============================\n"
-        comp_name = f"- Component name: <<{self.id}>>\n"
-        table = "- Results table\n" + tabulate(
-            {"time" : self.t, "pf" : self.pf, "action" : self.action, "output" : self.output},
+        title = f"Structural Component: {self.id}\n"
+        table = tabulate(
+            {"year" : self.t, "pf" : self.pf, "action" : self.action, "output" : self.output},
             headers = "keys", tablefmt="pretty")
-        return datatype + comp_name + table
+        return title + table
 
 class SystemLevel:
     """
