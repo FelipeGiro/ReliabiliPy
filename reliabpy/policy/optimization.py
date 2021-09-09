@@ -83,7 +83,7 @@ class HeuristicBased:
             expected_costs.append(df_temp)
 
         df_general = pd.concat(expected_costs, axis=1).T
-        df_general.sort_values('C_T', ascending=False, inplace=True)
+        df_general.sort_values('C_T', inplace=True)
         df_general.to_excel(writer, sheet_name="overview")
         writer.save()
 
