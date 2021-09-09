@@ -126,9 +126,7 @@ class ComponentLevel:
 
     def __str__(self):
         title = f"Structural Component: {self.id}\n"
-        table = tabulate(
-            {"year" : self.t, "pf" : self.pf, "action" : self.action, "output" : self.output},
-            headers = "keys", tablefmt="pretty")
+        table = tabulate(self.get_results(), headers="keys", tablefmt="pretty")
         return title + table
 
 class SystemLevel:
