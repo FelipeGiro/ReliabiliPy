@@ -40,6 +40,7 @@ class Simple:
         model : Initialized system model
             System model for the offshroe wind turbine.
         """
+        # TODO: change when we have transittion matrix
         atmosphetic_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "atm\\dr_OUT.mat"))
         submerged_zone__inputs = import_DBN_input_data(os.path.join(self.input_folder, "sub\\dr_OUT.mat"))
         buried_zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, "bur\\dr_OUT.mat"))
