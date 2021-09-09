@@ -12,10 +12,9 @@ import pandas as pd
 from reliabpy.policy.policy import HeuristicRules
 
 class HeuristicBased:
-    def __init__(self, model, save_folder, project_name = 'optimization'):
+    def __init__(self, model, save_folder):
         self.model = model
         self.save_folder = save_folder 
-        self.project_name = project_name
     
     def mount_policies_to_search(self, delta_t_array, nI_array, n_samples):
         self.policies = list(product(delta_t_array, nI_array))
@@ -23,9 +22,7 @@ class HeuristicBased:
         self.left_samples = n_samples*len(self.policies)
         
     def run_samples(self):
-        
         self.start_time = datetime.now()
-        self.save_folder = os.path.join(self.save_folder, self.start_time.strftime("%Y%m%d_%H%M%S_") + self.project_name)
         os.mkdir(self.save_folder)
 
         with open(os.path.join(self.save_folder, "_input.txt"), 'w') as input_reg:
@@ -96,7 +93,7 @@ if __name__ == '__main__':
 
     model = Simple()
     model.mount_model()
-    opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples")
+    opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples\\test")
     opt.mount_policies_to_search(delta_t_array=[5, 10], nI_array=[3,6], n_samples=20)
     opt.run_samples()
     opt.process_data()
