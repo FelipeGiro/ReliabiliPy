@@ -48,7 +48,7 @@ class OneEpisode:
         ax.plot(np.array(system_pf)[:, 0], np.array(system_pf)[:, 1])
 
         ax = axes[2]
-        t, C_C, C_I, C_R, R_F = self.system_model.yearly_costs_breakdown.values()
+        t, C_C, C_I, C_R, R_F, C_T = self.system_model.yearly_costs_breakdown.values()
         width = 0.35
         ax.set_title('Cost breakdown')
         ax.bar(t, R_F, width, label = 'Failure', color= 'darkred')
