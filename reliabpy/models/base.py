@@ -25,9 +25,9 @@ class ComponentLevel:
         self.id = id
         self.inference_model = inference_model
         self.inspection = inspection
-        self.t, self.pf, self.action, self.obs = list(), list(), list(), list()
+        self.t, self.pf, self.action, self.output = list(), list(), list(), list()
 
-    def store(self, action = False, obs = False):
+    def store(self):
         """
         Store (component level)
         =======================
@@ -36,10 +36,10 @@ class ComponentLevel:
 
         Parameters:
         -----------
-        obs : Any
-            Information about the component observation.
         action : Any
             Information about action on the component observation.
+        output : Any
+            Information about the component observation.
         
         Returns:
         --------
@@ -55,15 +55,17 @@ class ComponentLevel:
         """
         t      = self.inference_model.t
         pf     = self.inference_model.pf
+        action = self.inference_model.action
+        output = self.inference_model.output
         
-        self.last_results =  {"t" : t, "pf" : pf, "obs" : obs, "action" : action}
+        self.last_results =  {"t" : t, "pf" : pf, "action" : action, "output" : output}
 
         self.t.append(t) 
         self.pf.append(pf) 
         self.action.append(action) 
-        self.obs.append(obs) 
+        self.output.append(output) 
 
-        return t, pf, obs, action
+        return t, pf, output, action
     
     def forward_one_timestep(self):
         # TODO: get inference call from system level class and put here
@@ -87,14 +89,14 @@ class ComponentLevel:
         Get the results for the components lifetime.
         """
         if dtype == "dict":
-            results = {"time" : self.t, "pf" : self.pf, "action" : self.action, "obs" : self.obs}
+            results = {"time" : self.t, "pf" : self.pf, "action" : self.action, "output" : self.output}
         return results
 
     def __str__(self):
         datatype = "DataType: StructuralComponent\n===============================\n"
         comp_name = f"- Component name: <<{self.name}>>\n"
         table = "- Results table\n" + tabulate(
-            {"time" : self.t, "pf" : self.pf, "action" : self.action, "obs" : self.obs},
+            {"time" : self.t, "pf" : self.pf, "action" : self.action, "output" : self.output},
             headers = "keys", tablefmt="pretty")
         return datatype + comp_name + table
 
@@ -172,7 +174,7 @@ class SystemLevel:
                 for i in self.to_inspect:
                     component = self.components_list[i]
                     component.inference_model.update(component.inspection) # TODO: put this in the Component Level class 
-                    component.store(obs=True)
+                    component.store()
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
 
@@ -182,7 +184,7 @@ class SystemLevel:
                 for i in self.to_repair:
                     component = self.components_list[i]
                     component.inference_model.perform_action()
-                    component.store(action=True)
+                    component.store()
                     self.step_results = self.get_step_results()
                 self.system_pf.append(self._system_reliability())
 
@@ -191,7 +193,7 @@ class SystemLevel:
         pf_list = [x['pf'] for x in step_results]
         return (self.t, self.system_dependancies.compute_system_pf(pf_list))
          
-    def get_step_results(self, variable_name=False):
+    def get_step_results(self, variable_name=False, dtype='dict'):
         """
         Get step results
         ================
@@ -206,13 +208,24 @@ class SystemLevel:
         step_results : list
             List of Component Level current results.
         """
-        step_results = dict()
-        for component in self.components_list:
-            temp = component.last_results
-            if variable_name:
-                temp = temp[variable_name]
-            step_results[component.id] = temp
-        return step_results
+        if dtype == 'dict':
+            step_results = dict()
+            for component in self.components_list:
+                temp = component.last_results
+                if variable_name:
+                    temp = temp[variable_name]
+                step_results[component.id] = temp
+            return step_results
+        if (dtype == 'list') or (dtype == 'np.array'):
+            step_results = list()
+            for component in self.components_list:
+                temp = component.last_results
+                if variable_name:
+                    temp = temp[variable_name]
+                step_results.append(temp)
+            if dtype == 'np.array':
+                step_results = np.array(step_results)
+            return step_results
 
     def get_components_results(self):
         """

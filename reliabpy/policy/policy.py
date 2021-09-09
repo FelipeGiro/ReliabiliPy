@@ -36,9 +36,10 @@ class HeuristicRules:
     def to_observe(self):
         to_inspect = []
         pf_list = np.array([x['pf'] for x in self.system_model.step_results.values()])
+        t = int(self.system_model.components_list[0].last_results['t'])
         if self.to_avoid is not None:
             pf_list[self.to_avoid] = -1
-        if self.system_model.components_list[0].last_results['t'] % self.delta_t == 0:
+        if t % self.delta_t == 0:
             to_inspect = np.argpartition(pf_list, -int(self.nI))[-int(self.nI):]
         if ~self.last_year_action and self.system_model.t == self.system_model.lifetime:
             to_inspect = []
@@ -46,4 +47,7 @@ class HeuristicRules:
         return to_inspect
     
     def to_repair(self):
-        return self.system_model.to_inspect
+        output = self.system_model.get_step_results('output', dtype='list')
+        detected = np.array(output) == 'D'
+        ids = [i for i, x in enumerate(detected) if x]
+        return ids

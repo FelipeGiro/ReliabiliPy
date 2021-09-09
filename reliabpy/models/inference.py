@@ -7,7 +7,7 @@ import torch
 class _Base(object):
     def _global_init(self):
         self.store_results = True
-        self.t, self.obs, self.action = 0, None, None
+        self.t, self.action, self.output = 0, None, None
 
         self.force_detection =  False
         self.force_notdetection = False
@@ -18,8 +18,8 @@ class _Base(object):
             self.results.append([
                 self.t, 
                 self.pf,
-                self.obs,
-                self.action
+                self.action,
+                self.output
                 ])
 
     def get_pf(self):
@@ -54,13 +54,13 @@ class _Base(object):
         Return a dictionary with the results for the entire episode: 
         - year   : year
         - pf     : probability of failure
-        - obs    : observation
-        - action : action on a component
+        - action    : observation
+        - output : output on a component
 
         Return:
         -------
         results : dict
-            year, pf, obs, action
+            year, pf, action, output
         """
 
         if not self.store_results:
@@ -68,7 +68,7 @@ class _Base(object):
 
         results = np.array(self.results)
 
-        return {"year" : results[:,0], "pf" : results[:,1], "obs" : results[:,2], "action" : results[:,3]}
+        return {"year" : results[:,0], "pf" : results[:,1], "action" : results[:,2], "output" : results[:,3]}
 
 class MonteCarloSimulation(_Base):
     """
@@ -132,7 +132,7 @@ class MonteCarloSimulation(_Base):
         parameters : dict
             inspection parameters. so far, with only "quality" key (good, normal and bad)
         """
-        self.obs = 'PoD'
+        self.action = 'PoD'
         parameters, invPoD_func = PoD.get_settings(parameters['quality'], inverse=True)
 
         uniform_dist = np.random.uniform(size=self.num_samples)
@@ -246,8 +246,8 @@ class DynamicBayesianNetwork(_Base):
             self.results = [[
                 self.t, 
                 self.pf,
-                self.obs,
-                self.action]]
+                self.action,
+                self.output]]
 
     def predict(self):
         """
@@ -256,10 +256,13 @@ class DynamicBayesianNetwork(_Base):
         
         Propagate one time step.
         """
-        self.t += 1
+        
         self.s = torch.matmul(self.s, self.T)
-        self.obs, self.action = None, None
+        
+        self.t += 1
         self.pf = self.get_prob_fail()
+        self.action = None
+        self.output = None
         
         if self.store_results: self._store_results()
     
@@ -277,7 +280,6 @@ class DynamicBayesianNetwork(_Base):
         parameters : dict
             inspection parameters. so far, with only "quality" key (good, normal and bad)
         """
-        self.model = 'PoD'
 
         parameters, function = PoD.get_settings(insp_quality)
         obs_pmf = function(self.states_values, **parameters)
@@ -299,22 +301,29 @@ class DynamicBayesianNetwork(_Base):
                 self.s = self.s*(1 - obs_state)
 
         self.s /= self.s.sum()
-        self.obs, self.action = None, None
         self.pf = self.get_prob_fail()
+
+        self.t += 1e-6 # to enable Dataframe Concat
+        self.pf = self.get_prob_fail()
+        self.action = 'PoD'
+        if self.crack_detected: self.output = 'D'
         
         if self.store_results: self._store_results()
     
     def perform_action(self):
         """
-        Perform action
+        Perform output
         ==============
 
-        Perform perfect repair action.
+        Perform perfect repair output.
         """
-        if self.crack_detected:
-            self.action = 'perfect_repair'
-            self.s = self.s0
-            self.pf = self.get_prob_fail()
+        self.s = self.s0
+
+        self.t += 1e-6 # to enable Dataframe Concat
+        self.pf = self.get_prob_fail()
+        self.action = 'PR'
+        self.output = 's0'
+
         if self.store_results: self._store_results()
         
     def get_prob_fail(self):

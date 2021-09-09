@@ -87,7 +87,7 @@ if __name__ == '__main__':
     model = Simple()
     model.mount_model()
     opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples")
-    opt.mount_policies_to_search(delta_t_array=[5,10,15], nI_array=[2,4,8], n_samples=25)
+    opt.mount_policies_to_search(delta_t_array=[5,10,15], nI_array=[2,4,8], n_samples=1000)
     opt.run_samples()
     opt.process_data()
 

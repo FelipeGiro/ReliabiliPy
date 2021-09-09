@@ -107,7 +107,7 @@ class Simple:
 
         self.monopile = SystemLevel(
             components_reliability_models_list, 
-            policy_rules = HeuristicRules(delta_t = 5, nI = 3),
+            policy_rules = HeuristicRules(delta_t = 50, nI = 6),
             system_dependancies = System_of_Subsystems(zone_assingment, zone_k),
             cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=10000, r=0.02)
         )

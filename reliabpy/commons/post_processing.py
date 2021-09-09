@@ -76,11 +76,7 @@ class OneEpisode:
         df_costs = pd.DataFrame(self.system_model.yearly_costs_breakdown)
         df_costs.set_index('t', inplace=True)
 
-        obs_map = self._build_map(self.system_model.system_obs, index=df_costs.index)
-        action_map = self._build_map(self.system_model.system_obs, index=df_costs.index)
-
-        df_obs = pd.DataFrame(obs_map, index=df_costs.index)
-        df_action = pd.DataFrame(action_map, index=df_costs.index)
+        df_action, df_output = self._build_maps(self.system_model.components_list)
 
         # TODO: put this in another function
         list_df, comp_names = list(), list()
@@ -108,19 +104,27 @@ class OneEpisode:
         writer = pd.ExcelWriter(os.path.join(self.savefolder, 'SystemReliability.xlsx'), engine='xlsxwriter')
 
         df_costs.to_excel(writer, sheet_name='Cost_Breakdown')
-        df_obs.to_excel(writer, sheet_name='Observation_Map')
         df_action.to_excel(writer, sheet_name='Action_Map')
+        df_output.to_excel(writer, sheet_name='Output_Map')
         df_pfs.to_excel(writer, sheet_name='Prob_Failure')
         
         writer.save()
 
-    def _build_map(self, comp_dict, index):
-        for key, value in comp_dict.items():
-            base_array = np.zeros_like(index, dtype=bool)
-            base_array[value] = True
-            comp_dict[key] = base_array
-        
-        return comp_dict
+    def _build_maps(self, components_list):
+        list_i, list_a, list_o = list(), list(), list()
+        for comp in components_list:
+            id, t, a, o = comp.id, comp.t, comp.action, comp.output
+            list_i.append(id)
+            list_a.append(pd.DataFrame(a, index=t))
+            list_o.append(pd.DataFrame(o, index=t))
+
+        df_action = pd.concat(list_a, axis=1, join='outer')
+        df_output = pd.concat(list_o, axis=1, join='outer')
+
+        df_action.columns = list_i
+        df_output.columns = list_i
+
+        return df_action, df_output
 
 class MonteCarlo:
     def __init__(self, folderpath):
