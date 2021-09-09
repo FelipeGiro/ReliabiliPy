@@ -56,6 +56,7 @@ class HeuristicBased:
         print(f"Elsapsed time : {self.end_time - self.start_time}")
 
     def process_data(self, load_folder=None):
+        expected_costs = list()
         if load_folder is None:
             self.load_folder = self.save_folder
         else:
@@ -80,14 +81,23 @@ class HeuristicBased:
             delta_t, nI = int(policy_dict['deltat']), int(policy_dict['nI'])
             df_temp = pd.DataFrame(policy_samples)
             df_temp.to_excel(writer, sheet_name=f't {delta_t} nI {nI}')
+
+            # expected costs
+            df_temp = df_temp.mean(axis=0)
+            df_temp["delta_t"], df_temp["nI"] = delta_t, nI
+            expected_costs.append(df_temp)
+
+        df_general = pd.concat(expected_costs, axis=1).T
+        df_general.to_excel(writer, sheet_name="overview")
         writer.save()
+
 if __name__ == '__main__':
     from reliabpy.examples.offshore_wind_turbine import Simple 
 
     model = Simple()
     model.mount_model()
     opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples")
-    opt.mount_policies_to_search(delta_t_array=[5,10,15], nI_array=[2,4,8], n_samples=1000)
+    opt.mount_policies_to_search(delta_t_array=[5, 10], nI_array=[3,6], n_samples=20)
     opt.run_samples()
     opt.process_data()
 
