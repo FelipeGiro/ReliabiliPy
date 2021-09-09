@@ -126,7 +126,7 @@ class ComponentLevel:
 
     def __str__(self):
         datatype = "DataType: StructuralComponent\n===============================\n"
-        comp_name = f"- Component name: <<{self.name}>>\n"
+        comp_name = f"- Component name: <<{self.id}>>\n"
         table = "- Results table\n" + tabulate(
             {"time" : self.t, "pf" : self.pf, "action" : self.action, "output" : self.output},
             headers = "keys", tablefmt="pretty")
