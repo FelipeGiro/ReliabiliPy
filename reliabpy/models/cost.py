@@ -75,6 +75,8 @@ class InspectionMaintenance:
         C_C[t_temp] += self.c_c*(1 - self.r)**(t_temp)
         
         R_F[abs_t[1:]] = self.c_f*delta_pf*(1 - self.r)**abs_t[1:]
+
+        C_T = C_C + C_I + C_R + R_F
         
-        system_model.yearly_costs_breakdown =  {'t' : abs_t, 'C_C' : C_C, 'C_I' : C_I, 'C_R' : C_R, 'R_F' : R_F}
-        system_model.cost_breakdown = {'C_C' : C_C.sum(), 'C_I' : C_I.sum(), 'C_R' : C_R.sum(), 'R_F' : R_F.sum()}
+        system_model.yearly_costs_breakdown =  {'t' : abs_t, 'C_C' : C_C, 'C_I' : C_I, 'C_R' : C_R, 'R_F' : R_F, 'C_T': C_T}
+        system_model.cost_breakdown = {'C_C' : C_C.sum(), 'C_I' : C_I.sum(), 'C_R' : C_R.sum(), 'R_F' : R_F.sum(), 'C_T': C_T.sum()}
