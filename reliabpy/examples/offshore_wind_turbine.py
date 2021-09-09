@@ -28,7 +28,7 @@ class Simple:
         self.input_folder = input_folder
         self.output_folder = output_folder
 
-    def mount_model(self):
+    def mount_model(self, zone_k = [3,3,3]):
         """
         Mount model
         ===========
@@ -103,11 +103,10 @@ class Simple:
         }
 
         zone_assingment = ['atm', 'atm', 'atm', 'atm', 'sub', 'sub', 'sub', 'sub', 'bur', 'bur', 'bur', 'bur']
-        zone_k = [3,3,3]
 
         self.monopile = SystemLevel(
             components_reliability_models_list, 
-            policy_rules = HeuristicRules(delta_t = 50, nI = 6),
+            policy_rules = HeuristicRules(delta_t = 5, nI = 6),
             system_dependancies = System_of_Subsystems(zone_assingment, zone_k),
             cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=10000, r=0.02)
         )
