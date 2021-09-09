@@ -55,7 +55,7 @@ class InspectionMaintenance:
         for component in system_model.components_list:
             action, output = np.array(component.action), np.array(component.output)
             y_t = (1 - self.r)**(np.array(component.t))
-            if any(output):
+            if any(action):
                 comp_t = np.array(component.t, dtype=int)
                 t_insp = comp_t[action == 'PoD']
                 t_repair = comp_t[action == 'PR']
@@ -63,8 +63,8 @@ class InspectionMaintenance:
                 C_I[t_insp] += self.c_i*(1 - self.r)**t_insp
                 C_R[t_repair] += self.c_r*(1 - self.r)**t_repair
 
-                system_insp[component.id]= np.array(comp_t)[output == 'D']
-                system_repair[component.id] = np.array(comp_t)[output == 's0']
+                system_insp[component.id]= t_insp
+                system_repair[component.id] = t_repair
             
             else:
                 system_insp[component.id]= list()
