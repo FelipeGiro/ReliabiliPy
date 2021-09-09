@@ -179,7 +179,9 @@ class SystemLevel:
             self.components_list.append(_temp_Component)
             self.step_results[_temp_Component.id] = _temp_Component.last_results
         
-        self.system_pf = [self._system_reliability()]
+        self.system_pf = None
+
+        self._system_reliability()
     
     
     def forward_one_timestep(self):
@@ -196,7 +198,7 @@ class SystemLevel:
         for component in self.components_list:
             component.predict()
             self.step_results = self.get_step_results()
-        self.system_pf.append(self._system_reliability())
+        self._system_reliability()
         
         if self.policy_rules is not None:
             # update
@@ -205,7 +207,7 @@ class SystemLevel:
                 for i in self.to_inspect:
                     self.components_list[i].update()
                     self.step_results = self.get_step_results()
-                self.system_pf.append(self._system_reliability())
+                self._system_reliability()
 
             # action
             self.to_repair = self.policy_rules.to_repair()
@@ -213,12 +215,16 @@ class SystemLevel:
                 for i in self.to_repair:
                     self.components_list[i].perform_action()
                     self.step_results = self.get_step_results()
-                self.system_pf.append(self._system_reliability())
+                self._system_reliability()
 
     def _system_reliability(self):
         step_results = list(self.step_results.values())
         pf_list = [x['pf'] for x in step_results]
-        return (self.t, self.system_dependancies.compute_system_pf(pf_list))
+        t__pf = (self.t, self.system_dependancies.compute_system_pf(pf_list))
+        if self.system_pf is not None:
+            self.system_pf.append(t__pf)
+        else:
+            self.system_pf = [t__pf]
          
     def get_step_results(self, variable_name=False, dtype='dict'):
         """
