@@ -1,12 +1,10 @@
 import numpy as np
 from itertools import product
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
 import pickle
 import os
 from glob import glob
 from tabulate import tabulate
-import copy
 import pandas as pd
 
 from reliabpy.policy.policy import HeuristicRules
@@ -85,6 +83,7 @@ class HeuristicBased:
             expected_costs.append(df_temp)
 
         df_general = pd.concat(expected_costs, axis=1).T
+        df_general.sort_values('C_T', ascending=False, inplace=True)
         df_general.to_excel(writer, sheet_name="overview")
         writer.save()
 
