@@ -68,14 +68,48 @@ class ComponentLevel:
         return t, pf, output, action
     
     def predict(self, store=True):
+        """
+        Predict
+        =======
+
+        Predict the state for the next step. Also know as transtion, 
+        propagation, etc.
+
+        Parameters:
+        -----------
+        store : Boolean
+            store and returns the values of current state.
+        """
         self.inference_model.predict() 
         if store: self.store()
 
     def update(self, store=True):
+        """
+        Update
+        =======
+
+        Update state face a pre-defined inspection technique.
+
+        Parameters:
+        -----------
+        store : Boolean
+            store and returns the values of current state.
+        """
         self.inference_model.update(self.inspection) 
         if store: self.store()
 
     def perform_action(self, store=True):
+        """
+        Perform action
+        ==============
+
+        Perform a action in the component (inspections, repair, etc).
+
+        Parameters:
+        -----------
+        store : Boolean
+            store and returns the values of current state.
+        """
         self.inference_model.perform_action() 
         if store: self.store()
 
