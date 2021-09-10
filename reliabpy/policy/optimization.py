@@ -18,6 +18,8 @@ class HeuristicBased:
         self.policies = list(product(delta_t_array, nI_array))
         self.n_samples = n_samples
         self.left_samples = n_samples*len(self.policies)
+
+        self.policies.append((10000, 1)) # no I&M policy
         
     def run_samples(self):
         self.start_time = datetime.now()
@@ -58,7 +60,7 @@ class HeuristicBased:
             self.load_folder =  load_folder
         
         output_path_list = glob(os.path.join(self.load_folder, '*.npy'))
-        writer = pd.ExcelWriter(os.path.join(self.load_folder, 'OptimizarionResults.xlsx'), engine='xlsxwriter')
+        writer = pd.ExcelWriter(os.path.join(self.load_folder, '0ptimizationResults.xlsx'), engine='xlsxwriter')
         for output_path in output_path_list:
             # getting the policy parameters
             policy_dict = dict()

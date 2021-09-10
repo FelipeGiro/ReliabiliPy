@@ -72,10 +72,9 @@ class System_of_Subsystems:
     k_list : array
         list of k values of each subsystem.
     """
-    def __init__(self, assignments, k_list):
+    def __init__(self, assignments, k_dict):
         self.assignments = np.array(assignments)
-        self.k_list = np.array(k_list)
-        self.zones = np.unique(self.assignments)
+        self.k_dict = k_dict
 
     def compute_system_pf(self, pf_list):
         """
@@ -96,7 +95,7 @@ class System_of_Subsystems:
         """
         pf_list = np.array(pf_list)
         subsystem_pfs = []
-        for zone, k in zip(self.zones, self.k_list):
+        for zone, k in self.k_dict.items():
             zone_pfs = pf_list[self.assignments == zone]
             subsystem_pfs.append(comp_k_out_of_n(zone_pfs, k))
         return comp_k_out_of_n(subsystem_pfs, len(subsystem_pfs))

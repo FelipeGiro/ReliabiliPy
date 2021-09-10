@@ -28,7 +28,7 @@ class Simple:
         self.input_folder = input_folder
         self.output_folder = output_folder
 
-    def mount_model(self, zone_k = [3,3,3]):
+    def mount_model(self, zone_k = {"atm":1, "sub":2, "bur":3}):
         """
         Mount model
         ===========
