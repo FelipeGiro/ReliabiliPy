@@ -113,20 +113,22 @@ class ComponentLevel:
         self.inference_model.perform_action() 
         if store: self.store()
 
-    def get_results(self, dtype="dict"):
+    def get_results(self, dtype="dict", to_print=False):
         """
         Get results (component level)
         =============================
 
         Get the results for the components lifetime.
         """
+        if to_print:
+            self.t = np.array(self.t, dtype=int)
         if dtype == "dict":
             results = {"time" : self.t, "pf" : self.pf, "action" : self.action, "output" : self.output}
         return results
 
     def __str__(self):
         title = f"Structural Component: {self.id}\n"
-        table = tabulate(self.get_results(), headers="keys", tablefmt="pretty")
+        table = tabulate(self.get_results(to_print=True), headers="keys", tablefmt="pretty")
         return title + table
 
 class SystemLevel:
