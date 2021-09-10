@@ -14,10 +14,11 @@ class HeuristicBased:
         self.model = model
         self.save_folder = save_folder 
     
-    def mount_policies_to_search(self, delta_t_array, nI_array, n_samples):
+    def mount_policies_to_search(self, delta_t_array, nI_array, n_samples, to_avoid=None):
         self.policies = list(product(delta_t_array, nI_array))
         self.n_samples = n_samples
         self.left_samples = n_samples*len(self.policies)
+        self.to_avoid = to_avoid
 
         self.policies.append((10000, 1)) # no I&M policy
         
@@ -32,7 +33,7 @@ class HeuristicBased:
         print(f"=== start of simulation : {self.start_time} ===")
         for delta_t, nI in self.policies:
             start = datetime.now()
-            policy = HeuristicRules(delta_t, nI)
+            policy = HeuristicRules(delta_t, nI, self.to_avoid)
             policy.import_model(self.model.monopile)
             self.model.monopile.policy_rules = policy
 
@@ -95,7 +96,7 @@ if __name__ == '__main__':
     model = Simple()
     model.mount_model()
     opt = HeuristicBased(model, "C:\\Developments\\reliabpy\\PhD\\examples\\test")
-    opt.mount_policies_to_search(delta_t_array=[5, 10], nI_array=[3,6], n_samples=20)
+    opt.mount_policies_to_search(delta_t_array=[5, 10], nI_array=[3,6], n_samples=20, to_avoid=[8,9,10,11])
     opt.run_samples()
     opt.process_data()
 
