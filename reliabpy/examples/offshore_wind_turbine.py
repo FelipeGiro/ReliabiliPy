@@ -28,7 +28,7 @@ class Simple:
         self.input_folder = input_folder
         self.output_folder = output_folder
 
-    def mount_model(self, zone_k = {"atm":1, "sub":2, "bur":3}):
+    def mount_model(self, zone_k = {"atm":3, "sub":2, "bur":3}):
         """
         Mount model
         ===========
@@ -107,7 +107,7 @@ class Simple:
 
         self.monopile = SystemLevel(
             components_reliability_models_list, 
-            policy_rules = HeuristicRules(delta_t = 5, nI = 6),
+            policy_rules = HeuristicRules(delta_t = 5, nI = 6, to_avoid=[8,9,10,11]),
             system_dependancies = System_of_Subsystems(zone_assingment, zone_k),
             cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=10000, r=0.02)
         )
@@ -141,9 +141,47 @@ class Simple:
         # TODO or to exclude: policy optimization
         n_samples
 
+class _Simple_ComponentLevel(Simple):
+    def mount_model(self, component):
+        """
+        Mount model in component level
+        ==============================
+
+        Just for study case
+        """
+        # TODO: change when we have transittion matrix
+        zone_inputs = import_DBN_input_data(os.path.join(self.input_folder, component + "\\dr_OUT.mat"))
+
+        zone_model = DynamicBayesianNetwork(*zone_inputs)
+
+        repair = DynamicBayesianNetwork(*zone_inputs)
+
+        component_reliability_models_list = {
+            component + '1' : {
+                'inference' : zone_model,
+                'inspection': 'normal', 
+                'repair'    : repair}
+        }
+
+        self.monopile = SystemLevel(
+            component_reliability_models_list, 
+            policy_rules = HeuristicRules(delta_t = 3, nI = 1, to_avoid=None),
+            system_dependancies = System_of_Subsystems([component], {component:1}),
+            cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=834, r=0.02)
+        )
     
+    def run_one_episode(self):
+        self.monopile.run(lifetime=20)
+
+        return self.monopile.cost_breakdown
+
 if __name__ == '__main__':
-    model = Simple()
-    model.mount_model()
+    # model = Simple()
+    # model.mount_model()
+    # model.run_one_episode()
+    # model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
+
+    model = _Simple_ComponentLevel()
+    model.mount_model('atm')
     model.run_one_episode()
     model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
