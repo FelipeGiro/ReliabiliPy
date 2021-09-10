@@ -136,10 +136,6 @@ class Simple:
     def save_results(self, savefolder = None):
         if savefolder is not None:
             self.monopile.post_process(savefolder)
-    @staticmethod
-    def optimize_heuristic_based_policy(self, n_samples= 10000):
-        # TODO or to exclude: policy optimization
-        n_samples
 
 class _Simple_ComponentLevel(Simple):
     def mount_model(self, component):
