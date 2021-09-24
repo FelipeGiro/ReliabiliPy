@@ -89,6 +89,10 @@ class OneEpisode:
             )
         )
         fig.update_layout(
+            title="Reliability analysis",
+            xaxis_title="Year",
+            yaxis_title="Probability of Failure",
+            legend_title="Component",
             xaxis = dict(
                 tickmode = 'linear',
                 tick0 = 0,
