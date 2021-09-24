@@ -5,14 +5,27 @@ def select_highest_VoI(pf_array, n):
 
 # TODO: implemnet user defined policy
 class UserDefined:
-    def __init__(self, system_model):
-        pass
+    def __init__(self, inspection_map):
+        self.inspection_map = inspection_map
+    
+    def import_model(self, system_model):
+        self.system_model = system_model
 
     def to_observe(self):
-        pass
+        t = int(self.system_model.components_list[0].last_results['t'])
+        if t > 20:
+            return list()
+        components_to_insp = self.inspection_map.loc[t].dropna().index
+        to_inspect = list()
+        for component in components_to_insp:
+            to_inspect.append(self.inspection_map.columns.get_loc(component))
+        return to_inspect
     
     def to_repair(self):
-        pass
+        output = self.system_model.get_step_results('output', dtype='list')
+        detected = np.array(output) == 'D'
+        ids = [i for i, x in enumerate(detected) if x]
+        return ids
 
 class DoNothing:
     def __init__(self, system_model):
