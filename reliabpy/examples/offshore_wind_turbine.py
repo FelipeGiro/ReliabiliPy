@@ -1,6 +1,6 @@
 from reliabpy.models.base import SystemLevel
 from reliabpy.models.inference import DynamicBayesianNetwork 
-from reliabpy.policy.policy import HeuristicRules
+from reliabpy.policy.policy import HeuristicRules, UserDefined
 from reliabpy.models.system_effects import System_of_Subsystems
 from reliabpy.models.cost import InspectionMaintenance
 from reliabpy.readwrite.ANAST import import_DBN_input_data
@@ -28,7 +28,9 @@ class Simple:
         self.input_folder = input_folder
         self.output_folder = output_folder
 
-    def mount_model(self, zone_k = {"atm":3, "sub":2, "bur":3}):
+    def mount_model(self, 
+                    zone_k = {"atm":3, "sub":2, "bur":3}, 
+                    policy_rules = HeuristicRules(delta_t = 5, nI = 6, to_avoid=[8,9,10,11])):
         """
         Mount model
         ===========
@@ -107,7 +109,7 @@ class Simple:
 
         self.monopile = SystemLevel(
             components_reliability_models_list, 
-            policy_rules = HeuristicRules(delta_t = 5, nI = 6, to_avoid=[8,9,10,11]),
+            policy_rules = policy_rules,
             system_dependancies = System_of_Subsystems(zone_assingment, zone_k),
             cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=10000, r=0.02)
         )
@@ -172,12 +174,17 @@ class _Simple_ComponentLevel(Simple):
         return self.monopile.cost_breakdown
 
 if __name__ == '__main__':
-    # model = Simple()
-    # model.mount_model()
-    # model.run_one_episode()
-    # model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
+    import pandas as pd
+    df_inspmap = pd.read_excel("C:\\Developments\\reliabpy\\PhD\\OWT_12comp_3detzones\\ComponentLevel\\InspectionMap.xlsx",
+                                index_col=0)
+    zone_k = {'atm':2, 'sub':3, 'bur':3}
 
-    model = _Simple_ComponentLevel()
-    model.mount_model('atm')
+    model = Simple()
+    model.mount_model(zone_k, UserDefined(df_inspmap))
     model.run_one_episode()
     model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
+
+    # model = _Simple_ComponentLevel()
+    # model.mount_model('atm')
+    # model.run_one_episode()
+    # model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
