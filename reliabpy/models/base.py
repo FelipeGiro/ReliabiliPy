@@ -296,7 +296,7 @@ class SystemLevel:
             self.forward_one_timestep()
         self.cost_model.compute_cost_breakdown(self)
     
-    def post_process(self, savefolder, plot=True, excel=True):
+    def post_process(self, savefolder, plot=True, excel=True, interactive_plot=True):
         """
         Post-proccess
         =============
@@ -317,5 +317,7 @@ class SystemLevel:
             post.plot_overview()
         if excel:
             post.to_excel()
+        if interactive_plot:
+            post.plot_interactive()
         
 

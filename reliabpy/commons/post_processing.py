@@ -1,6 +1,7 @@
 import numpy as np 
 import pickle
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import os
 import pandas as pd
 
@@ -62,6 +63,39 @@ class OneEpisode:
             plt.savefig(os.path.join(self.savefolder, 'SystemReliability.png'))
         else:
             plt.plot()
+
+    def plot_interactive(self):
+        # TODO: function documentation
+        components_dict, system_pf = self.system_model.get_components_results()
+        
+        fig = go.Figure()
+        for key in components_dict:
+            fig.add_trace(
+                go.Scatter(
+                    x=components_dict[key]['time'], 
+                    y=components_dict[key]['pf'],
+                    line=dict(color="#4d4d4d"),
+                    name = key,
+                    hovertemplate='<b>Year</b>: %{x}<br><b>P<sub>F</sub></b>:%{y}<br><b>Action:</b> %{text}',
+                    text=[str(a) +' | '+ str(o) for a, o in zip(components_dict[key]['action'], components_dict[key]['output'])])
+            )
+        fig.add_trace(
+            go.Scatter(
+                x=np.array(system_pf)[:, 0], 
+                y=np.array(system_pf)[:, 1],
+                line=dict(color='#c20000'),
+                name='System',
+                hovertemplate='Year: %{x}<br>P_F:%{y}'
+            )
+        )
+        fig.update_layout(
+            xaxis = dict(
+                tickmode = 'linear',
+                tick0 = 0,
+                dtick = 1
+            )
+)
+        fig.write_html(os.path.join(self.savefolder, 'SystemReliability.html'))
 
     def to_excel(self):
         """
