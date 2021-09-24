@@ -70,6 +70,41 @@ class OneEpisode:
 
         Save the results in a Excel spreadsheet with the tabs:
         - CostBreakdown : yearly cost breakdown
+        - <component_id> : each tab have its own tab
+        - System : system probability of failure
+        """
+        writer = pd.ExcelWriter(os.path.join(self.savefolder, 'SystemReliability.xlsx'), engine='xlsxwriter')
+
+        df_costs = pd.DataFrame(self.system_model.yearly_costs_breakdown)
+        df_costs.set_index('t', inplace=True)
+        df_costs.to_excel(writer, sheet_name='Cost_Breakdown')
+
+        # system
+        df_system = pd.DataFrame(self.system_model.system_pf)
+        df_system.columns = ['t', 'pf']
+        df_system.set_index('t', inplace=True)
+        df_system.to_excel(writer, sheet_name="System_PF")
+
+        # components
+        for component in self.system_model.components_list:
+            temp_df = pd.DataFrame({
+            't' : component.t, 
+            'pf' : np.array(component.pf), 
+            'action' : component.action, 
+            'output' : component.output})
+            temp_df.set_index('t', inplace=True)
+            temp_df.to_excel(writer, sheet_name=component.id)
+        
+        writer.save()
+
+
+    def to_excel_depreciated(self):
+        """
+        Save to excel
+        =============
+
+        Save the results in a Excel spreadsheet with the tabs:
+        - CostBreakdown : yearly cost breakdown
         - ObservationMap : time and location of observations on components
         - ActionMap : time and location of actions on components 
         """
