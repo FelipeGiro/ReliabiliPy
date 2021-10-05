@@ -29,8 +29,8 @@ class Simple:
         self.output_folder = output_folder
 
     def mount_model(self, 
-                    zone_k = {"atm":3, "sub":2, "bur":3}, 
-                    policy_rules = HeuristicRules(delta_t = 5, nI = 6, to_avoid=[8,9,10,11])):
+                    zone_k = {"atm":3, "sub":3, "bur":3}, 
+                    policy_rules = HeuristicRules(delta_t = 4, nI = 6, to_avoid=[8,9,10,11])):
         """
         Mount model
         ===========
@@ -163,7 +163,7 @@ class _Simple_ComponentLevel(Simple):
 
         self.monopile = SystemLevel(
             component_reliability_models_list, 
-            policy_rules = HeuristicRules(delta_t = 3, nI = 1, to_avoid=None),
+            policy_rules = HeuristicRules(delta_t = 6, nI = 5, to_avoid=None),
             system_dependancies = System_of_Subsystems([component], {component:1}),
             cost_model = InspectionMaintenance(c_c=5.0, c_i=1.0, c_r=10.0, c_f=834, r=0.02)
         )
@@ -177,10 +177,10 @@ if __name__ == '__main__':
     import pandas as pd
     df_inspmap = pd.read_excel("C:\\Developments\\reliabpy\\PhD\\OWT_12comp_3detzones\\ComponentLevel\\InspectionMap.xlsx",
                                 index_col=0)
-    zone_k = {'atm':2, 'sub':3, 'bur':3}
+    zone_k = {'atm':3, 'sub':4, 'bur':3}
 
     model = Simple()
-    model.mount_model(zone_k, UserDefined(df_inspmap))
+    model.mount_model(zone_k)
     model.run_one_episode()
     model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
 
