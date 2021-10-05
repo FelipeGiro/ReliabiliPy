@@ -60,7 +60,9 @@ class OneEpisode:
         
 
         if self.savefolder:
-            plt.savefig(os.path.join(self.savefolder, 'SystemReliability.png'))
+            full_path = os.path.join(self.savefolder, 'SystemReliability.png')
+            plt.savefig(full_path)
+            print(f"Plot saved: {full_path}")
         else:
             plt.plot()
 
@@ -98,8 +100,10 @@ class OneEpisode:
                 tick0 = 0,
                 dtick = 1
             )
-)
-        fig.write_html(os.path.join(self.savefolder, 'SystemReliability.html'))
+        )
+        full_path = os.path.join(self.savefolder, 'SystemReliability.html')
+        fig.write_html(full_path)
+        print(f"HTML saved: {full_path}")
 
     def to_excel(self):
         """
@@ -111,7 +115,8 @@ class OneEpisode:
         - <component_id> : each tab have its own tab
         - System : system probability of failure
         """
-        writer = pd.ExcelWriter(os.path.join(self.savefolder, 'SystemReliability.xlsx'), engine='xlsxwriter')
+        full_path = os.path.join(self.savefolder, 'SystemReliability.xlsx')
+        writer = pd.ExcelWriter(full_path, engine='xlsxwriter')
 
         df_costs = pd.DataFrame(self.system_model.yearly_costs_breakdown)
         df_costs.set_index('t', inplace=True)
@@ -134,6 +139,7 @@ class OneEpisode:
             temp_df.to_excel(writer, sheet_name=component.id)
         
         writer.save()
+        print(f"Excel saved: {full_path}")
 
 
     def to_excel_depreciated(self):
