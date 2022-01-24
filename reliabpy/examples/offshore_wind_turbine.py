@@ -174,9 +174,6 @@ class _Simple_ComponentLevel(Simple):
         return self.monopile.cost_breakdown
 
 if __name__ == '__main__':
-    # import pandas as pd
-    # df_inspmap = pd.read_excel("C:\\Developments\\reliabpy\\PhD\\OWT_12comp_3detzones\\ComponentLevel\\InspectionMap.xlsx",
-    #                             index_col=0)
     zone_k = {'atm':3, 'sub':3, 'bur':3}
 
     model = Simple()
