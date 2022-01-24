@@ -24,7 +24,7 @@ class Simple:
     - System dependencies : series system of k-out-of-n subsystems.
     - Cost model: for inspetion and maintenance.
     """
-    def __init__(self, input_folder="C:\\Developments\\reliabpy\PhD\\transition_matrices", output_folder="C:\\Developments\\reliabpy\\PhD\examples"):
+    def __init__(self, input_folder="data\\transition_matrices", output_folder="data"):
         self.input_folder = input_folder
         self.output_folder = output_folder
 
@@ -174,17 +174,17 @@ class _Simple_ComponentLevel(Simple):
         return self.monopile.cost_breakdown
 
 if __name__ == '__main__':
-    import pandas as pd
-    df_inspmap = pd.read_excel("C:\\Developments\\reliabpy\\PhD\\OWT_12comp_3detzones\\ComponentLevel\\InspectionMap.xlsx",
-                                index_col=0)
-    zone_k = {'atm':3, 'sub':4, 'bur':3}
+    # import pandas as pd
+    # df_inspmap = pd.read_excel("C:\\Developments\\reliabpy\\PhD\\OWT_12comp_3detzones\\ComponentLevel\\InspectionMap.xlsx",
+    #                             index_col=0)
+    zone_k = {'atm':3, 'sub':3, 'bur':3}
 
     model = Simple()
     model.mount_model(zone_k)
     model.run_one_episode()
-    model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
+    model.save_results('data')
 
     # model = _Simple_ComponentLevel()
     # model.mount_model('atm')
     # model.run_one_episode()
-    # model.save_results('C:\\Developments\\reliabpy\\PhD\\examples')
+    # model.save_results('data')
